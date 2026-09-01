@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+:root {
+  --background: #090a0a;
+  --foreground: #e8e8e3;
+
+  --card: #0d0f0f;
+  --card-foreground: #e8e8e3;
+
+  --popover: #0d0f0f;
+  --popover-foreground: #e8e8e3;
+
+  --primary: #e8e8e3;
+  --primary-foreground: #090a0a;
+
+  --secondary: #151717;
+  --secondary-foreground: #e8e8e3;
+
+  --muted: #111313;
+  --muted-foreground: #737875;
+
+  --accent: #b7ff4a;
+  --accent-foreground: #090a0a;
+
+  --destructive: #ff4d4d;
+
+  --border: #292c2c;
+  --input: #292c2c;
+  --ring: #b7ff4a;
+
+  --radius: 0px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    ),
+    var(--background);
+
+  background-size: 48px 48px;
+  color: var(--foreground);
+
+  font-family: var(--font-sans), sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Technical mono utility */
+
+.font-mono,
+code,
+pre,
+kbd {
+  font-family: var(--font-mono), monospace;
+}
+
+/* Selection */
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #292c2c;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #414545;
+}
+
+/* Technical grid */
+
+.j-grid {
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 32px 32px;
+}
+
+/* Hairline */
+
+.j-line {
+  height: 1px;
+  background: var(--border);
+}
+
+/* Accent */
+
+.j-accent {
+  color: var(--accent);
+}
+
+/* Status dot */
+
+.j-status {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+}
+
+/* Technical label */
+
+.j-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* Big editorial type */
+
+.j-display {
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.88;
+}
+
+/* Brutalist interactive */
+
+.j-interactive {
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
+}
+
+.j-interactive:hover {
+  border-color: #555b58;
+}
+
+/* Thin frame */
+
+.j-frame {
+  border: 1px solid var(--border);
+}
+
+/* No accidental rounded UI */
+
+button,
+input,
+textarea,
+select {
+  border-radius: 0 !important;
+}
+
+/* subtle scanline texture */
+
+.j-scanlines {
+  position: relative;
+}
+
+.j-scanlines::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(255,255,255,0.012) 4px
+  );
+}
