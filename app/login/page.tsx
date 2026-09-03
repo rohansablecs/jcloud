@@ -2,27 +2,51 @@
 
 import { FormEvent, useState } from "react"
 import { Cloud, Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { authApi } from "@/lib/api"
 
 export default function LoginPage() {
+  const router = useRouter()
+
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  function handleSubmit(
+  async function handleSubmit(
     event: FormEvent<HTMLFormElement>
   ) {
     event.preventDefault()
 
-    if (!username || !password) {
+    const cleanUsername = username.trim()
+
+    if (!cleanUsername || !password) {
+      setError("Enter your username and password.")
       return
     }
 
     setLoading(true)
+    setError("")
 
-    // Real authentication will be connected to FastAPI.
+    try {
+      await authApi.login(cleanUsername, password)
+
+      router.replace("/dashboard")
+      router.refresh()
+    } catch (err) {
+      console.error("[JCloud Login]", err)
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to connect to JCloud."
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -58,11 +82,10 @@ export default function LoginPage() {
               <Input
                 id="username"
                 value={username}
-                onChange={(e) =>
-                  setUsername(e.target.value)
-                }
+                onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
                 autoComplete="username"
+                disabled={loading}
               />
             </div>
 
@@ -78,26 +101,34 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 autoComplete="current-password"
+                disabled={loading}
               />
             </div>
+
+            {error && (
+              <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </p>
+            )}
 
             <Button
               type="submit"
               className="w-full"
               disabled={loading}
             >
-              {loading && (
-                <Loader2 className="mr-2 size-4 animate-spin" />
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign in"
               )}
-
-              Sign in
             </Button>
-          </div>a
+          </div>
         </form>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">

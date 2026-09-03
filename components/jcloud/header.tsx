@@ -1,9 +1,17 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { LogOut, User } from "lucide-react"
+import {
+  LogOut,
+  User,
+} from "lucide-react"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 
 import {
   DropdownMenu,
@@ -13,8 +21,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+import {
+  authApi,
+  type UserProfile,
+} from "@/lib/api"
+
+
 const titles: Record<string, string> = {
   "/": "Dashboard",
+  "/dashboard": "Dashboard",
   "/storage": "Storage",
   "/machines": "Machines",
   "/applications": "Applications",
@@ -23,17 +38,86 @@ const titles: Record<string, string> = {
   "/settings": "Settings",
 }
 
+
 export function Header() {
+
   const pathname = usePathname()
   const router = useRouter()
+
+  const [profile, setProfile] =
+    useState<UserProfile | null>(null)
+
+  const [avatarError, setAvatarError] =
+    useState(false)
 
   const title =
     titles[pathname] ??
     Object.entries(titles).find(
       ([path]) =>
-        path !== "/" && pathname.startsWith(path)
+        path !== "/" &&
+        pathname.startsWith(path)
     )?.[1] ??
     "JCloud"
+
+
+  useEffect(() => {
+
+    let cancelled = false
+
+    async function loadProfile() {
+
+      try {
+        const data =
+          await authApi.me()
+
+        if (!cancelled) {
+          setProfile(data)
+        }
+
+      } catch {
+        if (!cancelled) {
+          setProfile(null)
+        }
+      }
+    }
+
+    loadProfile()
+
+    return () => {
+      cancelled = true
+    }
+
+  }, [])
+
+
+  async function handleLogout() {
+
+    try {
+      await authApi.logout()
+    } catch {}
+
+    router.replace("/login")
+    router.refresh()
+  }
+
+
+  const displayName =
+    profile?.display_name ||
+    profile?.username ||
+    "Account"
+
+  const initials =
+    displayName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(
+        (part) =>
+          part.charAt(0).toUpperCase()
+      )
+      .join("") ||
+    "JC"
+
 
   return (
     <header className="flex h-[92px] items-center justify-between border-b border-[#292c2c] px-6 lg:px-10">
@@ -59,8 +143,6 @@ export function Header() {
 
       <div className="flex items-center gap-6">
 
-        {/* SERVER STATUS */}
-
         <div className="hidden items-center gap-2 font-mono text-[9px] uppercase tracking-[0.08em] text-[#737875] sm:flex">
 
           <span className="size-1.5 bg-[#b7ff4a]" />
@@ -70,14 +152,14 @@ export function Header() {
         </div>
 
 
-        {/* ACCOUNT MENU */}
+        {/* ACCOUNT */}
 
         <DropdownMenu>
 
           <DropdownMenuTrigger
             className="
               flex
-              size-8
+              size-10
               items-center
               justify-center
               border
@@ -92,10 +174,21 @@ export function Header() {
             "
           >
 
-            <Avatar className="size-7 rounded-none">
+            <Avatar className="size-8 rounded-none">
+
+              {!avatarError && (
+                <AvatarImage
+                  src={authApi.avatarUrl(64)}
+                  alt={displayName}
+                  onError={() =>
+                    setAvatarError(true)
+                  }
+                  className="rounded-none object-cover"
+                />
+              )}
 
               <AvatarFallback className="rounded-none bg-transparent font-mono text-[9px] text-[#e8e8e3]">
-                JC
+                {initials}
               </AvatarFallback>
 
             </Avatar>
@@ -106,7 +199,7 @@ export function Header() {
           <DropdownMenuContent
             align="end"
             className="
-              w-48
+              w-64
               rounded-none
               border-[#292c2c]
               bg-[#0d0f0f]
@@ -115,8 +208,32 @@ export function Header() {
             "
           >
 
+            <div className="px-3 py-3">
+
+              <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-[#e8e8e3]">
+                {displayName}
+              </div>
+
+              <div className="mt-1 font-mono text-[9px] text-[#4f5452]">
+                @{profile?.username ?? "account"}
+              </div>
+
+              {profile?.email && (
+                <div className="mt-1 truncate font-mono text-[9px] text-[#4f5452]">
+                  {profile.email}
+                </div>
+              )}
+
+            </div>
+
+
+            <DropdownMenuSeparator className="bg-[#292c2c]" />
+
+
             <DropdownMenuItem
-              onClick={() => router.push("/settings")}
+              onClick={() =>
+                router.push("/settings")
+              }
               className="
                 cursor-pointer
                 rounded-none
@@ -138,7 +255,7 @@ export function Header() {
 
 
             <DropdownMenuItem
-              onClick={() => router.push("/login")}
+              onClick={handleLogout}
               className="
                 cursor-pointer
                 rounded-none

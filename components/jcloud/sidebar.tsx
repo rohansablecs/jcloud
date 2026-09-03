@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 const items = [
-  ["01", "Dashboard", "/"],
+  ["01", "Dashboard", "/dashboard"],
   ["02", "Storage", "/storage"],
   ["03", "Machines", "/machines"],
   ["04", "Applications", "/applications"],
@@ -21,7 +21,7 @@ export function Sidebar() {
 
       <div className="flex h-[92px] flex-col justify-between border-b border-[#292c2c] px-6 py-5">
 
-        <Link href="/" className="group">
+        <Link href="/dashboard" className="group">
           <div className="flex items-center gap-3">
 
             <div className="relative flex size-8 items-center justify-center border border-[#555b58]">
@@ -55,7 +55,7 @@ export function Sidebar() {
           {items.map(([number, label, href]) => {
 
             const active =
-              href === "/"
+              href === "/dashboard"
                 ? pathname === "/"
                 : pathname.startsWith(href)
 
