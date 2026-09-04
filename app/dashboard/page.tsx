@@ -50,6 +50,15 @@ const systems = [
   },
 ]
 
+type StoragePool = {
+  path?: string
+  total?: number
+  used?: number
+  free?: number
+  percent?: number
+  available?: boolean
+}
+
 type SystemStats = {
   cpu?: {
     usage_percent?: number
@@ -69,6 +78,13 @@ type SystemStats = {
     total?: number
     used?: number
     percent?: number
+  }
+  pools?: {
+    nextcloud?: StoragePool
+    applications?: StoragePool
+    databases?: StoragePool
+    vm?: StoragePool
+    backups?: StoragePool
   }
   network?: {
     rx_bytes?: number
@@ -99,6 +115,46 @@ function formatGB(value: number | undefined) {
 
   return `${(value / 1024 / 1024 / 1024).toFixed(1)} GB`
 }
+
+function poolStatus(pool: StoragePool | undefined) {
+  if (!pool) {
+    return "WAITING"
+  }
+
+  if (pool.available === false) {
+    return "UNAVAILABLE"
+  }
+
+  return "ONLINE"
+}
+
+const poolDefinitions = [
+  {
+    key: "nextcloud",
+    name: "NEXTCLOUD",
+    path: "/srv/nextcloud",
+  },
+  {
+    key: "applications",
+    name: "APPLICATIONS",
+    path: "/srv/applications",
+  },
+  {
+    key: "databases",
+    name: "DATABASES",
+    path: "/srv/databases",
+  },
+  {
+    key: "vm",
+    name: "VIRTUAL MACHINES",
+    path: "/srv/vm",
+  },
+  {
+    key: "backups",
+    name: "BACKUPS",
+    path: "/srv/backups",
+  },
+] as const
 
 export default function Dashboard() {
   const [stats, setStats] = useState<SystemStats | null>(null)
@@ -150,6 +206,8 @@ export default function Dashboard() {
 
   const memoryTotal =
     stats?.memory?.total
+
+  const pools = stats?.pools
 
   return (
     <JCloudShell>
@@ -460,6 +518,125 @@ export default function Dashboard() {
               <div className="mt-3 font-mono text-sm text-[#737875]">
                 5 SECOND INTERVAL
               </div>
+
+            </div>
+
+          </div>
+
+
+          {/* STORAGE POOLS */}
+
+          <div className="mt-10">
+
+            <div className="mb-6 flex items-end justify-between">
+
+              <div>
+
+                <div className="j-label">
+                  03 — STORAGE POOLS
+                </div>
+
+                <h2 className="mt-2 text-2xl font-medium tracking-tight">
+                  Infrastructure allocation
+                </h2>
+
+              </div>
+
+              <div className="hidden font-mono text-[8px] uppercase text-[#4f5452] sm:block">
+                05 POOLS
+              </div>
+
+            </div>
+
+
+            <div className="grid border-l border-t border-[#292c2c] md:grid-cols-2 lg:grid-cols-3">
+
+              {poolDefinitions.map((definition) => {
+
+                const pool =
+                  pools?.[definition.key]
+
+                const percent =
+                  pool?.percent
+
+                return (
+                  <div
+                    key={definition.key}
+                    className="border-b border-r border-[#292c2c] p-5"
+                  >
+
+                    <div className="flex items-start justify-between">
+
+                      <div className="j-label">
+                        {definition.name}
+                      </div>
+
+                      <span
+                        className={`font-mono text-[8px] ${
+                          pool?.available === false
+                            ? "text-[#737875]"
+                            : "text-[#b7ff4a]"
+                        }`}
+                      >
+                        ● {poolStatus(pool)}
+                      </span>
+
+                    </div>
+
+
+                    <div className="mt-6 font-mono text-2xl">
+                      {formatPercent(percent)}
+                    </div>
+
+
+                    <div className="mt-3 h-1 bg-[#1a1d1d]">
+
+                      <div
+                        className="h-full bg-[#b7ff4a] transition-all duration-500"
+                        style={{
+                          width: `${Math.min(
+                            Math.max(percent ?? 0, 0),
+                            100
+                          )}%`,
+                        }}
+                      />
+
+                    </div>
+
+
+                    <div className="mt-4 flex justify-between font-mono text-[8px] text-[#737875]">
+
+                      <span>
+                        {pool?.used !== undefined
+                          ? formatGB(pool.used)
+                          : "—"}
+                        {" USED"}
+                      </span>
+
+                      <span>
+                        {pool?.total !== undefined
+                          ? formatGB(pool.total)
+                          : "—"}
+                        {" TOTAL"}
+                      </span>
+
+                    </div>
+
+
+                    <div className="mt-3 font-mono text-[8px] text-[#4f5452]">
+                      {pool?.free !== undefined
+                        ? `${formatGB(pool.free)} FREE`
+                        : "WAITING"}
+                    </div>
+
+
+                    <div className="mt-2 truncate font-mono text-[8px] text-[#4f5452]">
+                      {pool?.path ?? definition.path}
+                    </div>
+
+                  </div>
+                )
+              })}
 
             </div>
 

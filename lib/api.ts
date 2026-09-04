@@ -115,16 +115,10 @@ export const storageApi = {
     )
   },
 
-  upload(
-    file: File,
-    path = ""
-  ) {
+  upload(file: File, path = "") {
     const formData = new FormData()
 
-    formData.append(
-      "file",
-      file
-    )
+    formData.append("file", file)
 
     return fetch(
       `${API_URL}/storage/upload?path=${encodeURIComponent(path)}`,
@@ -133,26 +127,94 @@ export const storageApi = {
         credentials: "include",
         body: formData,
       }
-    ).then(
-      async (response) => {
+    ).then(async (response) => {
 
-        if (!response.ok) {
-          let message =
-            `JCloud API error: ${response.status}`
+      if (!response.ok) {
+        let message =
+          `JCloud API error: ${response.status}`
 
-          try {
-            const data =
-              await response.json()
+        try {
+          const data = await response.json()
 
-            if (data?.detail) {
-              message = data.detail
-            }
-          } catch {}
+          if (data?.detail) {
+            message = data.detail
+          }
+        } catch {}
 
-          throw new Error(message)
-        }
+        throw new Error(message)
+      }
 
-        return response.json()
+      return response.json() as Promise<{
+        uploaded: boolean
+        name: string
+        path: string
+      }>
+    })
+  },
+
+  uploadMany(files: File[], path = "") {
+    const formData = new FormData()
+
+    for (const file of files) {
+      formData.append("files", file)
+    }
+
+    return fetch(
+      `${API_URL}/storage/upload-many?path=${encodeURIComponent(path)}`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      }
+    ).then(async (response) => {
+
+      if (!response.ok) {
+        let message =
+          `JCloud API error: ${response.status}`
+
+        try {
+          const data = await response.json()
+
+          if (data?.detail) {
+            message = data.detail
+          }
+        } catch {}
+
+        throw new Error(message)
+      }
+
+      return response.json() as Promise<{
+        uploaded: number
+        files: Array<{
+          name: string
+          path: string
+        }>
+      }>
+    })
+  },
+
+  rename(path: string, name: string) {
+    return request<{
+      renamed: boolean
+      path: string
+      name: string
+    }>(
+      `/storage/rename?path=${encodeURIComponent(path)}&name=${encodeURIComponent(name)}`,
+      {
+        method: "POST",
+      }
+    )
+  },
+
+  move(path: string, destination: string) {
+    return request<{
+      moved: boolean
+      source: string
+      destination: string
+    }>(
+      `/storage/move?path=${encodeURIComponent(path)}&destination=${encodeURIComponent(destination)}`,
+      {
+        method: "POST",
       }
     )
   },
@@ -169,9 +231,7 @@ export const storageApi = {
     )
   },
 
-  async download(
-    path: string
-  ) {
+  async download(path: string) {
     const response = await fetch(
       `${API_URL}/storage/download?path=${encodeURIComponent(path)}`,
       {
@@ -180,9 +240,18 @@ export const storageApi = {
     )
 
     if (!response.ok) {
-      throw new Error(
+      let message =
         `JCloud API error: ${response.status}`
-      )
+
+      try {
+        const data = await response.json()
+
+        if (data?.detail) {
+          message = data.detail
+        }
+      } catch {}
+
+      throw new Error(message)
     }
 
     return response.blob()
@@ -214,6 +283,49 @@ export const monitoringApi = {
         used: number
         free: number
         percent: number
+      }
+
+      pools: {
+        nextcloud: {
+          path: string
+          total: number
+          used: number
+          free: number
+          percent: number
+          available: boolean
+        }
+        applications: {
+          path: string
+          total: number
+          used: number
+          free: number
+          percent: number
+          available: boolean
+        }
+        databases: {
+          path: string
+          total: number
+          used: number
+          free: number
+          percent: number
+          available: boolean
+        }
+        vm: {
+          path: string
+          total: number
+          used: number
+          free: number
+          percent: number
+          available: boolean
+        }
+        backups: {
+          path: string
+          total: number
+          used: number
+          free: number
+          percent: number
+          available: boolean
+        }
       }
 
       network: {
