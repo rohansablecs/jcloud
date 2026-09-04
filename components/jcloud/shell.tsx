@@ -1,3 +1,7 @@
+"use client"
+
+import { useState } from "react"
+
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 
@@ -6,12 +10,28 @@ export function JCloudShell({
 }: {
   children: React.ReactNode
 }) {
+  const [collapsed, setCollapsed] = useState(false)
+
   return (
     <div className="min-h-screen bg-[#090a0a] text-[#e8e8e3]">
 
-      <Sidebar />
+      <Sidebar
+        collapsed={collapsed}
+        onCollapsedChange={setCollapsed}
+      />
 
-      <div className="lg:pl-[250px]">
+      <div
+        className={`
+          transition-[padding]
+          duration-300
+          ease-out
+          ${
+            collapsed
+              ? "lg:pl-[64px]"
+              : "lg:pl-[250px]"
+          }
+        `}
+      >
 
         <Header />
 

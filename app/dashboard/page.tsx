@@ -153,7 +153,7 @@ export default function Dashboard() {
 
   return (
     <JCloudShell>
-      <div className="j-scanlines">
+      <div className="j-scanlines space-y-0">
 
         {/* INTRO */}
 
@@ -165,9 +165,9 @@ export default function Dashboard() {
               JCLOUD // PRIVATE INFRASTRUCTURE
             </div>
 
-            <div>
+            <div className="py-10 lg:py-0">
 
-              <h1 className="j-display max-w-[850px] text-[clamp(4rem,9vw,9rem)] uppercase">
+              <h1 className="j-display max-w-[850px] text-5xl font-medium uppercase tracking-[-0.045em] sm:text-6xl lg:text-7xl">
                 Your own
                 <br />
                 <span className="text-[#737875]">
@@ -179,7 +179,7 @@ export default function Dashboard() {
 
                 <div className="mt-1 size-2 shrink-0 bg-[#b7ff4a]" />
 
-                <p className="max-w-md font-mono text-[11px] leading-6 text-[#737875]">
+                <p className="max-w-md font-mono text-[9px] leading-5 text-[#737875]">
                   PRIVATE COMPUTE / STORAGE /
                   APPLICATIONS / DATA.
                   <br />
@@ -190,7 +190,7 @@ export default function Dashboard() {
 
             </div>
 
-            <div className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#4f5452]">
+            <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-[#4f5452]">
               NODE / 01 &nbsp;&nbsp; INDIA
             </div>
 
@@ -222,7 +222,7 @@ export default function Dashboard() {
 
             <div>
 
-              <div className="font-mono text-[11px] uppercase text-[#4f5452]">
+              <div className="font-mono text-[9px] uppercase text-[#4f5452]">
                 Primary node
               </div>
 
@@ -230,7 +230,7 @@ export default function Dashboard() {
                 JCLOUD-01
               </div>
 
-              <div className="mt-1 font-mono text-[10px] text-[#737875]">
+              <div className="mt-1 font-mono text-[9px] text-[#737875]">
                 Ubuntu Server / KVM
               </div>
 
@@ -253,7 +253,7 @@ export default function Dashboard() {
 
               </div>
 
-              <div className="mt-3 font-mono text-[10px] leading-6 text-[#737875]">
+              <div className="mt-3 font-mono text-[9px] leading-6 text-[#737875]">
 
                 CPU LOAD&nbsp;
                 {cpuLoad !== undefined
@@ -301,7 +301,7 @@ export default function Dashboard() {
 
             </div>
 
-            <div className="hidden font-mono text-[9px] uppercase text-[#4f5452] sm:block">
+            <div className="hidden font-mono text-[8px] uppercase text-[#4f5452] sm:block">
               04 SERVICES
             </div>
 
@@ -323,7 +323,7 @@ export default function Dashboard() {
 
                   <div className="flex items-start justify-between">
 
-                    <span className="font-mono text-[9px] text-[#4f5452]">
+                    <span className="font-mono text-[8px] text-[#4f5452]">
                       {system.index}
                     </span>
 
@@ -335,7 +335,7 @@ export default function Dashboard() {
 
                     <Icon className="mb-5 size-5 text-[#737875]" />
 
-                    <div className="font-mono text-[9px] tracking-[0.15em] text-[#737875]">
+                    <div className="font-mono text-[8px] tracking-[0.15em] text-[#737875]">
                       {system.type}
                     </div>
 
@@ -343,7 +343,7 @@ export default function Dashboard() {
                       {system.name}
                     </div>
 
-                    <div className="mt-2 font-mono text-[10px] text-[#4f5452]">
+                    <div className="mt-2 font-mono text-[9px] text-[#4f5452]">
                       {system.description}
                     </div>
 
@@ -374,7 +374,7 @@ export default function Dashboard() {
                 System health
               </h2>
 
-              <p className="mt-4 max-w-sm font-mono text-[10px] leading-6 text-[#4f5452]">
+              <p className="mt-4 max-w-sm font-mono text-[9px] leading-5 text-[#4f5452]">
                 Live infrastructure metrics from
                 the primary JCloud node.
               </p>

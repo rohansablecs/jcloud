@@ -1,22 +1,21 @@
 "use client"
 
 import { useEffect, useState } from "react"
-
-import {
-  Mail,
-  User,
-} from "lucide-react"
+import { Mail, User, ShieldCheck } from "lucide-react"
 
 import { JCloudShell } from "@/components/jcloud/shell"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 
 import {
   authApi,
   type UserProfile,
 } from "@/lib/api"
 
-
 export default function SettingsPage() {
-
   const [profile, setProfile] =
     useState<UserProfile | null>(null)
 
@@ -26,69 +25,62 @@ export default function SettingsPage() {
   const [error, setError] =
     useState("")
 
-
   useEffect(() => {
+    let cancelled = false
 
     async function loadProfile() {
-
       try {
+        const data = await authApi.me()
 
-        const data =
-          await authApi.me()
-
-        setProfile(data)
-
+        if (!cancelled) {
+          setProfile(data)
+        }
       } catch (err) {
+        console.error("[JCloud Settings]", err)
 
-        console.error(
-          "[JCloud Settings]",
-          err
-        )
-
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to load account."
-        )
-
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Unable to load account."
+          )
+        }
       } finally {
-
-        setLoading(false)
-
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
 
     loadProfile()
 
+    return () => {
+      cancelled = true
+    }
   }, [])
-
 
   const displayName =
     profile?.display_name ||
     profile?.username ||
     "Account"
 
-
   const initials =
     displayName
       .split(/\s+/)
       .filter(Boolean)
       .slice(0, 2)
-      .map(
-        (part) =>
-          part.charAt(0).toUpperCase()
+      .map((part) =>
+        part.charAt(0).toUpperCase()
       )
-      .join("") ||
-    "JC"
-
+      .join("") || "JC"
 
   return (
     <JCloudShell>
-
       <div className="space-y-10">
 
-        <section>
+        {/* HEADER */}
 
+        <section>
           <div className="j-label">
             ACCOUNT
           </div>
@@ -98,28 +90,27 @@ export default function SettingsPage() {
           </h2>
 
           <p className="mt-3 max-w-xl font-mono text-[10px] leading-6 text-[#4f5452]">
-            Your JCloud identity is synchronized
-            directly with your Nextcloud account.
+            Manage your JCloud account and
+            Nextcloud identity.
           </p>
-
         </section>
 
+        {/* ERROR */}
 
         {error && (
-          <div className="border border-[#292c2c] bg-[#0d0f0f] p-5 font-mono text-[10px] text-red-400">
+          <div className="max-w-3xl border border-red-900/40 bg-[#0d0f0f] p-5 font-mono text-[10px] text-red-400">
             {error}
           </div>
         )}
 
+        {/* PROFILE */}
 
         <section className="max-w-3xl border border-[#292c2c]">
 
           <div className="border-b border-[#292c2c] p-6">
-
             <div className="flex items-center justify-between">
 
               <div>
-
                 <div className="j-label">
                   PROFILE
                 </div>
@@ -127,19 +118,47 @@ export default function SettingsPage() {
                 <h3 className="mt-2 text-xl font-medium">
                   Account information
                 </h3>
-
               </div>
 
               <User className="size-5 text-[#4f5452]" />
+            </div>
+          </div>
 
+          {/* PROFILE HERO */}
+
+          <div className="flex items-center gap-5 border-b border-[#292c2c] p-6">
+
+            <Avatar className="size-16 rounded-none border border-[#292c2c]">
+              <AvatarImage
+                src={authApi.avatarUrl(128)}
+                alt={displayName}
+                className="rounded-none object-cover"
+              />
+
+              <AvatarFallback className="rounded-none bg-[#151717] font-mono text-sm text-[#e8e8e3]">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+
+            <div>
+              <div className="text-xl font-medium">
+                {loading
+                  ? "Loading..."
+                  : displayName}
+              </div>
+
+              <div className="mt-1 font-mono text-[10px] text-[#4f5452]">
+                {profile?.username
+                  ? `@${profile.username}`
+                  : "Loading account..."}
+              </div>
             </div>
 
           </div>
 
+          {/* ACCOUNT DATA */}
 
           <div className="grid sm:grid-cols-2">
-
-            {/* DISPLAY NAME */}
 
             <div className="border-b border-r border-[#292c2c] p-6">
 
@@ -147,16 +166,13 @@ export default function SettingsPage() {
                 DISPLAY NAME
               </div>
 
-              <div className="mt-4 text-lg">
+              <div className="mt-4 text-sm">
                 {loading
                   ? "Loading..."
                   : displayName}
               </div>
 
             </div>
-
-
-            {/* USERNAME */}
 
             <div className="border-b border-[#292c2c] p-6">
 
@@ -172,10 +188,7 @@ export default function SettingsPage() {
 
             </div>
 
-
-            {/* EMAIL */}
-
-            <div className="border-b border-r border-[#292c2c] p-6">
+            <div className="border-r border-[#292c2c] p-6">
 
               <div className="j-label">
                 EMAIL
@@ -193,10 +206,7 @@ export default function SettingsPage() {
 
             </div>
 
-
-            {/* SOURCE */}
-
-            <div className="border-b border-[#292c2c] p-6">
+            <div className="p-6">
 
               <div className="j-label">
                 IDENTITY PROVIDER
@@ -212,29 +222,46 @@ export default function SettingsPage() {
 
         </section>
 
+        {/* SECURITY / SESSION */}
 
         <section className="max-w-3xl border border-[#292c2c]">
 
-          <div className="p-6">
+          <div className="border-b border-[#292c2c] p-6">
 
-            <div className="j-label">
-              SESSION
+            <div className="flex items-center gap-3">
+
+              <ShieldCheck className="size-4 text-[#b7ff4a]" />
+
+              <div>
+                <div className="j-label">
+                  SECURITY
+                </div>
+
+                <h3 className="mt-2 text-lg font-medium">
+                  Session
+                </h3>
+              </div>
+
             </div>
 
-            <div className="mt-3 flex items-center gap-3">
+          </div>
+
+          <div className="p-6">
+
+            <div className="flex items-center gap-3">
 
               <span className="size-2 bg-[#b7ff4a]" />
 
-              <span className="font-mono text-[10px] uppercase">
+              <span className="font-mono text-[10px] uppercase tracking-[0.08em]">
                 JCloud session active
               </span>
 
             </div>
 
             <p className="mt-4 max-w-lg font-mono text-[9px] leading-5 text-[#4f5452]">
-              Authentication is handled by JCloud
-              while your identity and profile remain
-              synchronized with Nextcloud.
+              Your JCloud session authenticates
+              requests while your account identity
+              remains synchronized with Nextcloud.
             </p>
 
           </div>
@@ -242,7 +269,6 @@ export default function SettingsPage() {
         </section>
 
       </div>
-
     </JCloudShell>
   )
 }
