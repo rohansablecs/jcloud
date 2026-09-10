@@ -294,6 +294,7 @@ export const monitoringApi = {
           percent: number
           available: boolean
         }
+
         applications: {
           path: string
           total: number
@@ -302,6 +303,7 @@ export const monitoringApi = {
           percent: number
           available: boolean
         }
+
         databases: {
           path: string
           total: number
@@ -310,6 +312,7 @@ export const monitoringApi = {
           percent: number
           available: boolean
         }
+
         vm: {
           path: string
           total: number
@@ -318,6 +321,7 @@ export const monitoringApi = {
           percent: number
           available: boolean
         }
+
         backups: {
           path: string
           total: number
@@ -339,39 +343,124 @@ export const monitoringApi = {
 
 /* ==================== MACHINES ==================== */
 
+export type MachineLifecycleState =
+  | "AVAILABLE"
+  | "STARTING"
+  | "IN_USE"
+  | "RESETTING"
+  | "ERROR"
+
+export type MachinePowerState =
+  | "running"
+  | "stopped"
+  | "paused"
+  | "blocked"
+  | "crashed"
+  | "suspended"
+  | "shutdown"
+  | "unknown"
+  | "unavailable"
+
+export type Machine = {
+  id: string
+  name: string
+  display_name: string
+
+  state: MachinePowerState
+  state_code: number | null
+  reason: number | null
+
+  uuid: string | null
+
+  vcpus: number
+  memory_mb: number
+  disk_gb: number
+
+  lifecycle_state: MachineLifecycleState
+  owner: string | null
+  claimed_at: string | null
+  lease_expires_at: string | null
+}
+
+export type MachinesResponse = {
+  machines: Machine[]
+}
+
 export const machinesApi = {
 
   list() {
-    return request(
+    return request<MachinesResponse>(
       "/machines"
     )
   },
 
   get(id: string) {
-    return request(
-      `/machines/${id}`
+    return request<Machine>(
+      `/machines/${encodeURIComponent(id)}`
     )
   },
 
-  create(data: unknown) {
-    return request(
-      "/machines",
+  claim(id: string, leaseMinutes?: number) {
+    return request<Machine>(
+      `/machines/${encodeURIComponent(id)}/claim`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(
+          leaseMinutes
+            ? {
+                lease_minutes: leaseMinutes,
+              }
+            : {}
+        ),
       }
     )
   },
 
-  delete(id: string) {
-    return request(
-      `/machines/${id}`,
+  release(id: string) {
+    return request<Machine>(
+      `/machines/${encodeURIComponent(id)}/release`,
       {
-        method: "DELETE",
+        method: "POST",
       }
+    )
+  },
+
+  start(id: string) {
+    return request<Machine>(
+      `/machines/${encodeURIComponent(id)}/start`,
+      {
+        method: "POST",
+      }
+    )
+  },
+
+  stop(id: string) {
+    return request<Machine>(
+      `/machines/${encodeURIComponent(id)}/stop`,
+      {
+        method: "POST",
+      }
+    )
+  },
+
+  reboot(id: string) {
+    return request<Machine>(
+      `/machines/${encodeURIComponent(id)}/reboot`,
+      {
+        method: "POST",
+      }
+    )
+  },
+
+  console(id: string) {
+    return request<{
+      machine_id: string
+      console: string
+    }>(
+      `/machines/${encodeURIComponent(id)}/console`
     )
   },
 }
