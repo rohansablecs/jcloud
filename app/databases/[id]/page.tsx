@@ -106,11 +106,12 @@ export default function DatabaseDetailPage({
       const data = await databasesApi.stats(id)
 
       setStats({
-        cpu_percent: data.cpu_percent,
-        memory_usage: data.memory_usage,
-        memory_limit: data.memory_limit,
-        memory_percent: data.memory_percent,
-      })
+  database_id: data.database_id,
+  cpu_percent: data.cpu_percent,
+  memory_usage: data.memory_usage,
+  memory_limit: data.memory_limit,
+  memory_percent: data.memory_percent,
+})
     } catch {
       // Best effort.
     }
