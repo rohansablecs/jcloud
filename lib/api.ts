@@ -1,5 +1,4 @@
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "/api"
+const API_URL = "https://jcloud.taile8e3b7.ts.net/api"
 
 async function request<T>(
   path: string,
