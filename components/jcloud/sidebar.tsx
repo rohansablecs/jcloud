@@ -37,58 +37,82 @@ function JCloudLogo() {
       xmlns="http://www.w3.org/2000/svg"
       aria-label="JCloud"
     >
-      {/* CLOUD */}
+      <defs>
+        <mask
+          id="jcloud-sidebar-logo"
+          maskUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width="42"
+          height="34"
+        >
+          {/* Everything starts transparent */}
+          <rect
+            width="42"
+            height="34"
+            fill="black"
+          />
 
-      <path
-        d="
-          M10 27
-          H30
-          C36 27
-          40 23.7
-          40 19
-          C40 14.8
-          36.6 11.4
-          32 11.1
-          C30.6 6.1
-          26.3 2.8
-          21.1 2.8
-          C15.3 2.8
-          10.5 6.9
-          9.1 12
-          C4.1 12.2
-          0.8 15.4
-          0.8 19.7
-          C0.8 24
-          4.3 27
-          10 27
-          Z
-        "
-        fill="#b7ff4a"
-      />
+          {/* Cloud is visible */}
+          <path
+            d="
+              M10 27
+              H30
+              C36 27
+              40 23.7
+              40 19
+              C40 14.8
+              36.6 11.4
+              32 11.1
+              C30.6 6.1
+              26.3 2.8
+              21.1 2.8
+              C15.3 2.8
+              10.5 6.9
+              9.1 12
+              C4.1 12.2
+              0.8 15.4
+              0.8 19.7
+              C0.8 24
+              4.3 27
+              10 27
+              Z
+            "
+            fill="white"
+          />
 
-      {/* J CUT INTO CLOUD */}
+          {/* J becomes transparent / cut out */}
+          <path
+            d="
+              M23.5 7
+              V17.7
+              C23.5 20.8
+              22 22.5
+              19.5 22.5
+              C17 22.5
+              15.2 20.8
+              15.2 18.3
+            "
+            stroke="black"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
 
-      <path
-        d="
-          M23.5 7
-          V17.7
-          C23.5 20.8
-          22 22.5
-          19.5 22.5
-          C17 22.5
-          15.2 20.8
-          15.2 18.3
-        "
-        stroke="#090a0a"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
+          <path
+            d="M21 7 H26"
+            stroke="black"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </mask>
+      </defs>
 
-      <path
-        d="M21 7 H26"
-        stroke="#090a0a"
-        strokeWidth="3"
-        strokeLinecap="round"
+      {/* BLUE CLOUD ONLY */}
+      <rect
+        width="42"
+        height="34"
+        fill="#2563EB"
+        mask="url(#jcloud-sidebar-logo)"
       />
     </svg>
   )
@@ -109,8 +133,8 @@ export function Sidebar({
         z-50
         hidden
         border-r
-        border-[#292c2c]
-        bg-[#090a0a]
+        border-[#e4e8ef]
+        bg-white
         lg:block
         transition-[width]
         duration-300
@@ -123,33 +147,25 @@ export function Sidebar({
       `}
     >
 
-      {/* ================================================= */}
       {/* BRAND */}
-      {/* ================================================= */}
 
       <div
         className={`
           relative
           flex
-          h-[92px]
+          h-[76px]
           items-center
           border-b
-          border-[#292c2c]
+          border-[#e4e8ef]
           ${
             collapsed
               ? "justify-center"
-              : "px-6"
+              : "px-5"
           }
         `}
       >
 
         {collapsed ? (
-
-          /*
-           * COLLAPSED:
-           * The logo itself is the expand button.
-           * There is NO chevron rendered here.
-           */
 
           <button
             type="button"
@@ -163,20 +179,15 @@ export function Sidebar({
               w-full
               items-center
               justify-center
-              transition-transform
-              duration-200
-              hover:scale-105
+              rounded-lg
+              transition
+              hover:bg-[#f7f9fc]
             "
           >
             <JCloudLogo />
           </button>
 
         ) : (
-
-          /*
-           * EXPANDED:
-           * Normal logo + collapse control.
-           */
 
           <>
             <Link
@@ -194,12 +205,12 @@ export function Sidebar({
 
               <div className="ml-3">
 
-                <div className="text-[15px] font-semibold tracking-tight">
+                <div className="text-[15px] font-semibold tracking-tight text-[#172033]">
                   JCLOUD
                 </div>
 
-                <div className="mt-1 whitespace-nowrap font-mono text-[8px] tracking-[0.18em] text-[#737875]">
-                  PRIVATE INFRASTRUCTURE
+                <div className="mt-0.5 whitespace-nowrap text-[8px] font-medium uppercase tracking-[0.14em] text-[#98a2b3]">
+                  Private infrastructure
                 </div>
 
               </div>
@@ -217,21 +228,26 @@ export function Sidebar({
               aria-label="Collapse sidebar"
               className="
                 absolute
-                bottom-[-9px]
-                right-[-1px]
+                right-[-10px]
+                top-1/2
                 z-50
                 flex
                 size-5
+                -translate-y-1/2
                 items-center
                 justify-center
-                bg-[#090a0a]
-                text-[#59605d]
-                transition-colors
-                duration-150
-                hover:text-[#b7ff4a]
+                rounded-full
+                border
+                border-[#e4e8ef]
+                bg-white
+                text-[#98a2b3]
+                shadow-sm
+                transition
+                hover:border-[#bfdbfe]
+                hover:text-[#2563eb]
               "
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-3.5" />
             </button>
 
           </>
@@ -241,15 +257,13 @@ export function Sidebar({
       </div>
 
 
-      {/* ================================================= */}
       {/* EXPANDED CONTENT */}
-      {/* ================================================= */}
 
       <div
         className={`
           absolute
           inset-x-0
-          top-[92px]
+          top-[76px]
           bottom-0
           overflow-hidden
           transition-opacity
@@ -264,16 +278,16 @@ export function Sidebar({
 
         {/* NAVIGATION */}
 
-        <div className="px-4 py-8">
+        <div className="px-3 py-6">
 
-          <div className="mb-4 px-2 font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f5452]">
-            Navigation
+          <div className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#98a2b3]">
+            Workspace
           </div>
 
-          <nav>
+          <nav className="space-y-1">
 
             {items.map(
-              ([number, label, href]) => {
+              ([number, label, href, Icon]) => {
 
                 const active =
                   href === "/dashboard"
@@ -290,43 +304,55 @@ export function Sidebar({
                       flex
                       h-11
                       items-center
-                      border-b
-                      border-[#181a1a]
-                      px-2
-                      font-mono
-                      text-[11px]
-                      uppercase
-                      tracking-[0.08em]
-                      transition-colors
+                      rounded-lg
+                      px-3
+                      text-sm
+                      font-medium
+                      transition
                       ${
                         active
-                          ? "bg-[#b7ff4a] text-black"
-                          : "text-[#858b88] hover:bg-[#151717] hover:text-white"
+                          ? "bg-[#eff6ff] text-[#2563eb]"
+                          : "text-[#667085] hover:bg-[#f7f9fc] hover:text-[#344054]"
                       }
                     `}
                   >
 
-                    <span
+                    <div
                       className={`
-                        mr-4
-                        text-[9px]
+                        flex
+                        size-8
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-md
                         ${
                           active
-                            ? "text-black"
-                            : "text-[#4f5452]"
+                            ? "bg-white shadow-sm"
+                            : ""
                         }
                       `}
                     >
-                      {number}
-                    </span>
 
-                    <span>
+                      <Icon
+                        className={`
+                          size-4
+                          ${
+                            active
+                              ? "text-[#2563eb]"
+                              : "text-[#98a2b3] group-hover:text-[#667085]"
+                          }
+                        `}
+                      />
+
+                    </div>
+
+                    <span className="ml-3">
                       {label}
                     </span>
 
-                    <span className="ml-auto">
-                      {active ? "→" : ""}
-                    </span>
+                    {active && (
+                      <span className="ml-auto size-1.5 rounded-full bg-[#2563eb]" />
+                    )}
 
                   </Link>
                 )
@@ -340,58 +366,89 @@ export function Sidebar({
 
         {/* SYSTEM */}
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-[#292c2c]">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-[#eef1f5] bg-white">
 
-          <div className="p-5">
+          <div className="p-4">
 
-            <div className="mb-4 font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f5452]">
+            <div className="mb-3 px-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#98a2b3]">
               System
             </div>
 
+
             <Link
               href="/monitoring"
-              className="
-                mb-3
+              className={`
+                mb-1
                 flex
+                h-10
                 items-center
                 gap-3
-                font-mono
-                text-[10px]
-                uppercase
-                text-[#737875]
-                transition-colors
-                hover:text-white
-              "
+                rounded-lg
+                px-3
+                text-xs
+                font-medium
+                transition
+                ${
+                  pathname.startsWith(
+                    "/monitoring"
+                  )
+                    ? "bg-[#eff6ff] text-[#2563eb]"
+                    : "text-[#667085] hover:bg-[#f7f9fc] hover:text-[#344054]"
+                }
+              `}
             >
-              <span className="size-1.5 bg-[#b7ff4a]" />
+
+              <div className="flex size-7 items-center justify-center rounded-md bg-[#f7f9fc]">
+
+                <Activity className="size-3.5 text-[#667085]" />
+
+              </div>
+
               Monitoring
+
             </Link>
+
 
             <Link
               href="/settings"
-              className="
+              className={`
                 flex
+                h-10
                 items-center
                 gap-3
-                font-mono
-                text-[10px]
-                uppercase
-                text-[#737875]
-                transition-colors
-                hover:text-white
-              "
+                rounded-lg
+                px-3
+                text-xs
+                font-medium
+                transition
+                ${
+                  pathname.startsWith(
+                    "/settings"
+                  )
+                    ? "bg-[#eff6ff] text-[#2563eb]"
+                    : "text-[#667085] hover:bg-[#f7f9fc] hover:text-[#344054]"
+                }
+              `}
             >
-              <span className="size-1.5 border border-[#555b58]" />
+
+              <div className="flex size-7 items-center justify-center rounded-md bg-[#f7f9fc]">
+
+                <Settings className="size-3.5 text-[#667085]" />
+
+              </div>
+
               Settings
+
             </Link>
 
-            <div className="mt-8 flex justify-between border-t border-[#292c2c] pt-4 font-mono text-[8px] uppercase text-[#4f5452]">
 
-              <span>
-                JCLOUD
+            <div className="mt-4 flex items-center justify-between border-t border-[#eef1f5] px-2 pt-4 text-[10px] text-[#98a2b3]">
+
+              <span className="font-medium">
+                JCloud
               </span>
 
-              <span>
+              <span className="font-mono">
                 v0.1.0
               </span>
 
@@ -404,15 +461,13 @@ export function Sidebar({
       </div>
 
 
-      {/* ================================================= */}
       {/* COLLAPSED ICON RAIL */}
-      {/* ================================================= */}
 
       <div
         className={`
           absolute
           inset-x-0
-          top-[92px]
+          top-[76px]
           bottom-0
           flex
           flex-col
@@ -429,7 +484,7 @@ export function Sidebar({
 
         {/* PAGE ICONS */}
 
-        <nav>
+        <nav className="p-2">
 
           {items.map(
             ([number, label, href, Icon]) => {
@@ -446,24 +501,23 @@ export function Sidebar({
                   href={href}
                   title={label}
                   className={`
-                    relative
+                    mb-1
                     flex
-                    h-14
+                    h-11
                     w-full
                     items-center
                     justify-center
-                    border-b
-                    border-[#181a1a]
-                    transition-colors
+                    rounded-lg
+                    transition
                     ${
                       active
-                        ? "bg-[#b7ff4a] text-black"
-                        : "text-[#4f5452] hover:bg-[#151717] hover:text-[#b7ff4a]"
+                        ? "bg-[#eff6ff] text-[#2563eb]"
+                        : "text-[#98a2b3] hover:bg-[#f7f9fc] hover:text-[#667085]"
                     }
                   `}
                 >
 
-                  <Icon className="size-5" />
+                  <Icon className="size-4" />
 
                 </Link>
               )
@@ -475,44 +529,54 @@ export function Sidebar({
 
         {/* SYSTEM ICONS */}
 
-        <div className="mt-auto border-t border-[#292c2c]">
+        <div className="mt-auto border-t border-[#eef1f5] p-2">
 
           <Link
             href="/monitoring"
             title="Monitoring"
-            className="
+            className={`
+              mb-1
               flex
-              h-14
+              h-11
               w-full
               items-center
               justify-center
-              border-b
-              border-[#181a1a]
-              text-[#4f5452]
-              transition-colors
-              hover:bg-[#151717]
-              hover:text-[#b7ff4a]
-            "
+              rounded-lg
+              transition
+              ${
+                pathname.startsWith(
+                  "/monitoring"
+                )
+                  ? "bg-[#eff6ff] text-[#2563eb]"
+                  : "text-[#98a2b3] hover:bg-[#f7f9fc] hover:text-[#667085]"
+              }
+            `}
           >
-            <Activity className="size-5" />
+            <Activity className="size-4" />
           </Link>
+
 
           <Link
             href="/settings"
             title="Settings"
-            className="
+            className={`
               flex
-              h-14
+              h-11
               w-full
               items-center
               justify-center
-              text-[#4f5452]
-              transition-colors
-              hover:bg-[#151717]
-              hover:text-[#b7ff4a]
-            "
+              rounded-lg
+              transition
+              ${
+                pathname.startsWith(
+                  "/settings"
+                )
+                  ? "bg-[#eff6ff] text-[#2563eb]"
+                  : "text-[#98a2b3] hover:bg-[#f7f9fc] hover:text-[#667085]"
+              }
+            `}
           >
-            <Settings className="size-5" />
+            <Settings className="size-4" />
           </Link>
 
         </div>

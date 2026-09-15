@@ -76,197 +76,332 @@ export default function SettingsPage() {
 
   return (
     <JCloudShell>
-      <div className="space-y-10">
+      <div className="mx-auto w-full max-w-[1200px] space-y-8">
 
         {/* HEADER */}
 
-        <section>
-          <div className="j-label">
-            ACCOUNT
+        <section className="border-b border-[#e4e8ef] pb-7">
+
+          <div className="flex items-center gap-2 text-xs font-medium text-[#667085]">
+
+            <div className="flex size-7 items-center justify-center rounded-lg bg-[#eff6ff]">
+              <User className="size-3.5 text-[#2563eb]" />
+            </div>
+
+            Account settings
+
           </div>
 
-          <h2 className="mt-2 text-4xl font-medium tracking-tight">
+          <h1 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-[#172033] sm:text-4xl">
             Settings
-          </h2>
+          </h1>
 
-          <p className="mt-3 max-w-xl font-mono text-[10px] leading-6 text-[#4f5452]">
-            Manage your JCloud account and
-            Nextcloud identity.
+          <p className="mt-2 max-w-xl text-sm leading-6 text-[#667085]">
+            Manage your JCloud account and connected Nextcloud identity.
           </p>
+
         </section>
+
 
         {/* ERROR */}
 
         {error && (
-          <div className="max-w-3xl border border-red-900/40 bg-[#0d0f0f] p-5 font-mono text-[10px] text-red-400">
-            {error}
-          </div>
-        )}
 
-        {/* PROFILE */}
+          <div className="max-w-4xl rounded-xl border border-[#fecaca] bg-[#fef2f2] px-5 py-4">
 
-        <section className="max-w-3xl border border-[#292c2c]">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#b42318]">
 
-          <div className="border-b border-[#292c2c] p-6">
-            <div className="flex items-center justify-between">
+              <span className="size-2 rounded-full bg-[#dc2626]" />
 
-              <div>
-                <div className="j-label">
-                  PROFILE
-                </div>
-
-                <h3 className="mt-2 text-xl font-medium">
-                  Account information
-                </h3>
-              </div>
-
-              <User className="size-5 text-[#4f5452]" />
-            </div>
-          </div>
-
-          {/* PROFILE HERO */}
-
-          <div className="flex items-center gap-5 border-b border-[#292c2c] p-6">
-
-            <Avatar className="size-16 rounded-none border border-[#292c2c]">
-              <AvatarImage
-                src={authApi.avatarUrl(128)}
-                alt={displayName}
-                className="rounded-none object-cover"
-              />
-
-              <AvatarFallback className="rounded-none bg-[#151717] font-mono text-sm text-[#e8e8e3]">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-
-            <div>
-              <div className="text-xl font-medium">
-                {loading
-                  ? "Loading..."
-                  : displayName}
-              </div>
-
-              <div className="mt-1 font-mono text-[10px] text-[#4f5452]">
-                {profile?.username
-                  ? `@${profile.username}`
-                  : "Loading account..."}
-              </div>
-            </div>
-
-          </div>
-
-          {/* ACCOUNT DATA */}
-
-          <div className="grid sm:grid-cols-2">
-
-            <div className="border-b border-r border-[#292c2c] p-6">
-
-              <div className="j-label">
-                DISPLAY NAME
-              </div>
-
-              <div className="mt-4 text-sm">
-                {loading
-                  ? "Loading..."
-                  : displayName}
-              </div>
+              Unable to load account
 
             </div>
 
-            <div className="border-b border-[#292c2c] p-6">
-
-              <div className="j-label">
-                USERNAME
-              </div>
-
-              <div className="mt-4 font-mono text-sm">
-                {loading
-                  ? "Loading..."
-                  : profile?.username || "—"}
-              </div>
-
-            </div>
-
-            <div className="border-r border-[#292c2c] p-6">
-
-              <div className="j-label">
-                EMAIL
-              </div>
-
-              <div className="mt-4 flex items-center gap-2 font-mono text-sm">
-
-                <Mail className="size-3 text-[#4f5452]" />
-
-                {loading
-                  ? "Loading..."
-                  : profile?.email || "Not configured"}
-
-              </div>
-
-            </div>
-
-            <div className="p-6">
-
-              <div className="j-label">
-                IDENTITY PROVIDER
-              </div>
-
-              <div className="mt-4 font-mono text-sm">
-                NEXTCLOUD
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* SECURITY / SESSION */}
-
-        <section className="max-w-3xl border border-[#292c2c]">
-
-          <div className="border-b border-[#292c2c] p-6">
-
-            <div className="flex items-center gap-3">
-
-              <ShieldCheck className="size-4 text-[#b7ff4a]" />
-
-              <div>
-                <div className="j-label">
-                  SECURITY
-                </div>
-
-                <h3 className="mt-2 text-lg font-medium">
-                  Session
-                </h3>
-              </div>
-
-            </div>
-
-          </div>
-
-          <div className="p-6">
-
-            <div className="flex items-center gap-3">
-
-              <span className="size-2 bg-[#b7ff4a]" />
-
-              <span className="font-mono text-[10px] uppercase tracking-[0.08em]">
-                JCloud session active
-              </span>
-
-            </div>
-
-            <p className="mt-4 max-w-lg font-mono text-[9px] leading-5 text-[#4f5452]">
-              Your JCloud session authenticates
-              requests while your account identity
-              remains synchronized with Nextcloud.
+            <p className="mt-1.5 text-xs text-[#b42318]/80">
+              {error}
             </p>
 
           </div>
 
-        </section>
+        )}
+
+
+        <div className="grid max-w-4xl gap-5">
+
+          {/* PROFILE */}
+
+          <section className="overflow-hidden rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            {/* SECTION HEADER */}
+
+            <div className="flex items-center justify-between border-b border-[#eef1f5] px-6 py-5">
+
+              <div>
+
+                <div className="text-xs font-semibold uppercase tracking-[0.08em] text-[#667085]">
+                  Profile
+                </div>
+
+                <h2 className="mt-1.5 text-lg font-semibold tracking-tight text-[#172033]">
+                  Account information
+                </h2>
+
+                <p className="mt-1 text-xs text-[#98a2b3]">
+                  Your JCloud account identity.
+                </p>
+
+              </div>
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#f7f9fc]">
+
+                <User className="size-4 text-[#667085]" />
+
+              </div>
+
+            </div>
+
+
+            {/* PROFILE HERO */}
+
+            <div className="flex items-center gap-4 border-b border-[#eef1f5] px-6 py-6">
+
+              <Avatar className="size-16 rounded-xl border border-[#dfe5ee]">
+
+                <AvatarImage
+                  src={authApi.avatarUrl(128)}
+                  alt={displayName}
+                  className="rounded-xl object-cover"
+                />
+
+                <AvatarFallback className="rounded-xl bg-[#eff6ff] font-semibold text-[#2563eb]">
+                  {initials}
+                </AvatarFallback>
+
+              </Avatar>
+
+
+              <div className="min-w-0">
+
+                <div className="truncate text-xl font-semibold tracking-tight text-[#172033]">
+
+                  {loading
+                    ? "Loading..."
+                    : displayName}
+
+                </div>
+
+                <div className="mt-1 font-mono text-xs text-[#667085]">
+
+                  {profile?.username
+                    ? `@${profile.username}`
+                    : "Loading account..."}
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* ACCOUNT DATA */}
+
+            <div className="grid sm:grid-cols-2">
+
+              {/* DISPLAY NAME */}
+
+              <div className="border-b border-[#eef1f5] p-6 sm:border-r">
+
+                <div className="text-xs font-medium text-[#98a2b3]">
+                  Display name
+                </div>
+
+                <div className="mt-2 text-sm font-medium text-[#344054]">
+
+                  {loading
+                    ? "Loading..."
+                    : displayName}
+
+                </div>
+
+              </div>
+
+
+              {/* USERNAME */}
+
+              <div className="border-b border-[#eef1f5] p-6">
+
+                <div className="text-xs font-medium text-[#98a2b3]">
+                  Username
+                </div>
+
+                <div className="mt-2 font-mono text-sm font-medium text-[#344054]">
+
+                  {loading
+                    ? "Loading..."
+                    : profile?.username || "—"}
+
+                </div>
+
+              </div>
+
+
+              {/* EMAIL */}
+
+              <div className="border-b border-[#eef1f5] p-6 sm:border-b-0 sm:border-r">
+
+                <div className="text-xs font-medium text-[#98a2b3]">
+                  Email
+                </div>
+
+                <div className="mt-2 flex items-center gap-2 font-mono text-sm font-medium text-[#344054]">
+
+                  <Mail className="size-3.5 text-[#667085]" />
+
+                  <span className="truncate">
+
+                    {loading
+                      ? "Loading..."
+                      : profile?.email || "Not configured"}
+
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              {/* IDENTITY PROVIDER */}
+
+              <div className="p-6">
+
+                <div className="text-xs font-medium text-[#98a2b3]">
+                  Identity provider
+                </div>
+
+                <div className="mt-2 flex items-center gap-2 text-sm font-medium text-[#344054]">
+
+                  <span className="size-2 rounded-full bg-[#16a34a]" />
+
+                  Nextcloud
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          {/* SECURITY */}
+
+          <section className="overflow-hidden rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            {/* SECTION HEADER */}
+
+            <div className="flex items-center gap-3 border-b border-[#eef1f5] px-6 py-5">
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#ecfdf3]">
+
+                <ShieldCheck className="size-4 text-[#16a34a]" />
+
+              </div>
+
+              <div>
+
+                <div className="text-xs font-semibold uppercase tracking-[0.08em] text-[#667085]">
+                  Security
+                </div>
+
+                <h2 className="mt-1 text-lg font-semibold tracking-tight text-[#172033]">
+                  Session
+                </h2>
+
+              </div>
+
+            </div>
+
+
+            {/* SESSION STATUS */}
+
+            <div className="p-6">
+
+              <div className="flex items-center justify-between gap-4">
+
+                <div>
+
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[#172033]">
+
+                    <span className="size-2 rounded-full bg-[#16a34a]" />
+
+                    JCloud session active
+
+                  </div>
+
+                  <p className="mt-2 max-w-2xl text-xs leading-5 text-[#667085]">
+                    Your JCloud session authenticates requests while your
+                    account identity remains synchronized with Nextcloud.
+                  </p>
+
+                </div>
+
+
+                <div className="hidden rounded-lg bg-[#ecfdf3] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#15803d] sm:block">
+                  Secure
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          {/* ACCOUNT CONNECTION */}
+
+          <section className="rounded-xl border border-[#e4e8ef] bg-[#f8fbff] p-5">
+
+            <div className="flex gap-3">
+
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm">
+
+                <Mail className="size-4 text-[#2563eb]" />
+
+              </div>
+
+              <div>
+
+                <div className="text-sm font-semibold text-[#172033]">
+                  Connected account
+                </div>
+
+                <p className="mt-1 text-xs leading-5 text-[#667085]">
+                  JCloud uses your Nextcloud identity for account information
+                  and profile synchronization.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+
+        {/* FOOTER */}
+
+        <footer className="flex flex-col gap-2 border-t border-[#e4e8ef] py-5 text-xs text-[#98a2b3] sm:flex-row sm:items-center sm:justify-between">
+
+          <span>
+            JCloud · Account
+          </span>
+
+          <span>
+            Identity synchronized with Nextcloud
+          </span>
+
+        </footer>
 
       </div>
     </JCloudShell>

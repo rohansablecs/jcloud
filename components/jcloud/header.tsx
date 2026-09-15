@@ -79,6 +79,7 @@ export function Header() {
           setProfile(null)
         }
       }
+
     }
 
     loadProfile()
@@ -120,32 +121,43 @@ export function Header() {
 
 
   return (
-    <header className="flex h-[92px] items-center justify-between border-b border-[#292c2c] px-6 lg:px-10">
+    <header className="flex h-[76px] items-center justify-between border-b border-[#e4e8ef] bg-white px-5 lg:px-8">
 
       {/* PAGE LOCATION */}
 
-      <div className="flex items-center gap-5">
+      <div className="flex min-w-0 items-center gap-3">
 
-        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#4f5452]">
-          SYSTEM
-        </span>
+        <div className="hidden items-center gap-2 text-[10px] font-medium uppercase tracking-[0.08em] text-[#98a2b3] sm:flex">
 
-        <span className="h-3 w-px bg-[#292c2c]" />
+          <span>
+            JCloud
+          </span>
 
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#a5aaa7]">
+          <span className="text-[#d0d5dd]">
+            /
+          </span>
+
+        </div>
+
+
+        <div className="truncate text-sm font-semibold text-[#172033]">
+
           {title}
-        </span>
+
+        </div>
 
       </div>
 
 
       {/* RIGHT SIDE */}
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
 
-        <div className="hidden items-center gap-2 font-mono text-[9px] uppercase tracking-[0.08em] text-[#737875] sm:flex">
+        {/* SYSTEM STATUS */}
 
-          <span className="size-1.5 bg-[#b7ff4a]" />
+        <div className="hidden items-center gap-2 rounded-full bg-[#ecfdf3] px-3 py-1.5 text-[10px] font-medium text-[#15803d] sm:flex">
+
+          <span className="size-1.5 rounded-full bg-[#16a34a]" />
 
           System online
 
@@ -162,19 +174,22 @@ export function Header() {
               size-10
               items-center
               justify-center
+              rounded-xl
               border
-              border-[#292c2c]
-              bg-transparent
+              border-[#e4e8ef]
+              bg-white
               p-0
-              text-[#e8e8e3]
               outline-none
-              transition-colors
-              hover:bg-[#151717]
-              focus-visible:border-[#b7ff4a]
+              shadow-sm
+              transition
+              hover:bg-[#f7f9fc]
+              focus-visible:border-[#2563eb]
+              focus-visible:ring-4
+              focus-visible:ring-[#2563eb]/10
             "
           >
 
-            <Avatar className="size-8 rounded-none">
+            <Avatar className="size-8 rounded-lg">
 
               {!avatarError && (
                 <AvatarImage
@@ -183,11 +198,11 @@ export function Header() {
                   onError={() =>
                     setAvatarError(true)
                   }
-                  className="rounded-none object-cover"
+                  className="rounded-lg object-cover"
                 />
               )}
 
-              <AvatarFallback className="rounded-none bg-transparent font-mono text-[9px] text-[#e8e8e3]">
+              <AvatarFallback className="rounded-lg bg-[#eff6ff] font-semibold text-[10px] text-[#2563eb]">
                 {initials}
               </AvatarFallback>
 
@@ -198,28 +213,61 @@ export function Header() {
 
           <DropdownMenuContent
             align="end"
+            sideOffset={8}
             className="
               w-64
-              rounded-none
-              border-[#292c2c]
-              bg-[#0d0f0f]
-              p-1
-              text-[#e8e8e3]
+              rounded-xl
+              border-[#e4e8ef]
+              bg-white
+              p-1.5
+              text-[#172033]
+              shadow-[0_12px_32px_rgba(16,24,40,0.12)]
             "
           >
 
+            {/* ACCOUNT SUMMARY */}
+
             <div className="px-3 py-3">
 
-              <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-[#e8e8e3]">
-                {displayName}
+              <div className="flex items-center gap-3">
+
+                <Avatar className="size-9 rounded-lg">
+
+                  {!avatarError && (
+                    <AvatarImage
+                      src={authApi.avatarUrl(64)}
+                      alt={displayName}
+                      onError={() =>
+                        setAvatarError(true)
+                      }
+                      className="rounded-lg object-cover"
+                    />
+                  )}
+
+                  <AvatarFallback className="rounded-lg bg-[#eff6ff] text-[10px] font-semibold text-[#2563eb]">
+                    {initials}
+                  </AvatarFallback>
+
+                </Avatar>
+
+
+                <div className="min-w-0">
+
+                  <div className="truncate text-sm font-semibold text-[#172033]">
+                    {displayName}
+                  </div>
+
+                  <div className="mt-0.5 truncate font-mono text-[10px] text-[#98a2b3]">
+                    @{profile?.username ?? "account"}
+                  </div>
+
+                </div>
+
               </div>
 
-              <div className="mt-1 font-mono text-[9px] text-[#4f5452]">
-                @{profile?.username ?? "account"}
-              </div>
 
               {profile?.email && (
-                <div className="mt-1 truncate font-mono text-[9px] text-[#4f5452]">
+                <div className="mt-3 truncate border-t border-[#eef1f5] pt-3 font-mono text-[10px] text-[#98a2b3]">
                   {profile.email}
                 </div>
               )}
@@ -227,8 +275,10 @@ export function Header() {
             </div>
 
 
-            <DropdownMenuSeparator className="bg-[#292c2c]" />
+            <DropdownMenuSeparator className="bg-[#eef1f5]" />
 
+
+            {/* ACCOUNT */}
 
             <DropdownMenuItem
               onClick={() =>
@@ -236,40 +286,58 @@ export function Header() {
               }
               className="
                 cursor-pointer
-                rounded-none
-                font-mono
-                text-[10px]
-                uppercase
-                tracking-[0.08em]
-                focus:bg-[#151717]
-                focus:text-white
+                rounded-lg
+                px-3
+                py-2.5
+                text-xs
+                font-medium
+                text-[#344054]
+                outline-none
+                focus:bg-[#f7f9fc]
+                focus:text-[#172033]
               "
             >
-              <User className="mr-2 size-3" />
+
+              <div className="mr-2 flex size-7 items-center justify-center rounded-md bg-[#eff6ff]">
+
+                <User className="size-3.5 text-[#2563eb]" />
+
+              </div>
 
               Account
+
             </DropdownMenuItem>
 
 
-            <DropdownMenuSeparator className="bg-[#292c2c]" />
+            <DropdownMenuSeparator className="bg-[#eef1f5]" />
 
+
+            {/* SIGN OUT */}
 
             <DropdownMenuItem
               onClick={handleLogout}
               className="
                 cursor-pointer
-                rounded-none
-                font-mono
-                text-[10px]
-                uppercase
-                tracking-[0.08em]
-                focus:bg-[#151717]
-                focus:text-white
+                rounded-lg
+                px-3
+                py-2.5
+                text-xs
+                font-medium
+                text-[#dc2626]
+                outline-none
+                focus:bg-[#fef2f2]
+                focus:text-[#dc2626]
               "
             >
-              <LogOut className="mr-2 size-3" />
+
+              <div className="mr-2 flex size-7 items-center justify-center rounded-md bg-[#fef2f2]">
+
+                <LogOut className="size-3.5 text-[#dc2626]" />
+
+              </div>
 
               Sign out
+
             </DropdownMenuItem>
 
           </DropdownMenuContent>

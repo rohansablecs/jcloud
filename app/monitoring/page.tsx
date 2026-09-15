@@ -160,28 +160,34 @@ export default function MonitoringPage() {
 
   return (
     <JCloudShell>
-      <div className="space-y-8">
+      <div className="mx-auto w-full max-w-[1500px] space-y-8">
 
         {/* HEADER */}
 
-        <section className="flex flex-col justify-between gap-6 border-b border-[#292c2c] pb-8 lg:flex-row lg:items-end">
+        <section className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
 
           <div>
 
-            <div className="flex items-center gap-3 font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f5452]">
-              <span className="size-1.5 bg-[#b7ff4a]" />
-              Infrastructure / Telemetry
+            <div className="flex items-center gap-2 text-xs font-medium text-[#667085]">
+
+              <div className="flex size-7 items-center justify-center rounded-lg bg-[#eff6ff]">
+                <Activity className="size-3.5 text-[#2563eb]" />
+              </div>
+
+              Infrastructure monitoring
+
             </div>
 
-            <h2 className="mt-4 text-5xl font-medium tracking-[-0.045em]">
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-[#172033] sm:text-4xl">
               Monitoring
-            </h2>
+            </h1>
 
-            <p className="mt-3 max-w-lg font-mono text-[9px] leading-5 text-[#4f5452]">
-              Live metrics from the JCloud server.
+            <p className="mt-2 max-w-xl text-sm text-[#667085]">
+              Live performance and network metrics from your JCloud server.
             </p>
 
           </div>
+
 
           <button
             onClick={loadStats}
@@ -190,113 +196,152 @@ export default function MonitoringPage() {
               h-10
               items-center
               gap-2
+              rounded-lg
               border
-              border-[#353a37]
-              bg-[#0b0d0d]
+              border-[#d0d5dd]
+              bg-white
               px-4
-              font-mono
-              text-[9px]
-              uppercase
-              tracking-[0.1em]
-              text-[#a5aaa7]
-              transition-colors
-              hover:bg-[#151717]
-              hover:text-[#e8e8e3]
+              text-sm
+              font-medium
+              text-[#344054]
+              shadow-sm
+              transition
+              hover:bg-[#f7f9fc]
+              hover:text-[#172033]
+              focus:outline-none
+              focus:ring-4
+              focus:ring-[#2563eb]/10
             "
           >
-            <RefreshCw className="size-3.5" />
+            <RefreshCw className="size-4" />
             Refresh
           </button>
 
         </section>
 
 
-        {/* SYSTEM STRIP */}
+        {/* STATUS BAR */}
 
-        <div className="grid grid-cols-2 border-y border-[#292c2c] sm:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-          <div className="border-r border-[#292c2c] px-5 py-4">
+          {/* TELEMETRY */}
 
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="text-xs font-medium text-[#667085]">
               Telemetry
             </div>
 
-            <div className="mt-2 flex items-center gap-2 font-mono text-[9px] uppercase">
+            <div className="mt-3 flex items-center gap-2">
+
               <span
-                className={`size-1.5 ${
+                className={`size-2 rounded-full ${
                   error
-                    ? "bg-red-400"
+                    ? "bg-[#dc2626]"
                     : stats
-                      ? "bg-[#b7ff4a]"
-                      : "bg-[#4f5452]"
+                      ? "bg-[#16a34a]"
+                      : "bg-[#d99a16]"
                 }`}
               />
 
-              {error
-                ? "Offline"
-                : stats
-                  ? "Online"
-                  : "Connecting"}
+              <span className="text-sm font-semibold text-[#172033]">
+                {error
+                  ? "Offline"
+                  : stats
+                    ? "Online"
+                    : "Connecting"}
+              </span>
+
+            </div>
+
+            <div className="mt-1 text-xs text-[#98a2b3]">
+              JCloud server connection
             </div>
 
           </div>
 
-          <div className="border-r border-[#292c2c] px-5 py-4">
 
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
-              Polling
+          {/* POLLING */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="text-xs font-medium text-[#667085]">
+              Polling interval
             </div>
 
-            <div className="mt-2 font-mono text-[9px] uppercase">
-              5 Seconds
+            <div className="mt-3 text-2xl font-semibold tracking-tight text-[#172033]">
+              5s
+            </div>
+
+            <div className="mt-1 text-xs text-[#98a2b3]">
+              Automatic refresh
             </div>
 
           </div>
 
-          <div className="border-r border-[#292c2c] px-5 py-4">
 
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
+          {/* METRICS */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="text-xs font-medium text-[#667085]">
               Metrics
             </div>
 
-            <div className="mt-2 font-mono text-[9px] uppercase">
-              04 Active
+            <div className="mt-3 text-2xl font-semibold tracking-tight text-[#172033]">
+              04
+            </div>
+
+            <div className="mt-1 text-xs text-[#98a2b3]">
+              CPU, memory, storage, network
             </div>
 
           </div>
 
-          <div className="px-5 py-4">
 
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
-              Updated
+          {/* LAST UPDATED */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="text-xs font-medium text-[#667085]">
+              Last updated
             </div>
 
-            <div className="mt-2 truncate font-mono text-[9px]">
+            <div className="mt-3 truncate font-mono text-sm font-medium text-[#172033]">
               {lastUpdated
                 ? lastUpdated.toLocaleTimeString()
                 : "—"}
             </div>
 
+            <div className="mt-1 text-xs text-[#98a2b3]">
+              Latest server response
+            </div>
+
           </div>
 
-        </div>
+        </section>
 
 
         {/* ERROR */}
 
         {error && (
-          <div className="border border-red-900/40 bg-red-950/10 p-4">
 
-            <div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.1em] text-red-400">
-              <span className="size-1.5 bg-red-400" />
-              Server error
+          <div className="rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3">
+
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#b42318]">
+
+              <span className="size-2 rounded-full bg-[#dc2626]" />
+
+              Unable to reach JCloud server
+
             </div>
 
-            <p className="mt-2 font-mono text-[9px] leading-5 text-red-300/70">
+            <p className="mt-1.5 text-xs leading-5 text-[#b42318]/80">
               {error}
             </p>
 
           </div>
+
         )}
 
 
@@ -304,44 +349,49 @@ export default function MonitoringPage() {
 
         <section>
 
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-4">
 
-            <span className="font-mono text-[8px] uppercase tracking-[0.15em] text-[#4f5452]">
+            <h2 className="text-lg font-semibold tracking-tight text-[#172033]">
               System resources
-            </span>
+            </h2>
 
-            <span className="font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
-              Live telemetry
-            </span>
+            <p className="mt-1 text-xs text-[#98a2b3]">
+              Current resource utilization on the JCloud server.
+            </p>
 
           </div>
 
-          <div className="grid gap-px border border-[#292c2c] bg-[#292c2c] md:grid-cols-3">
+
+          <div className="grid gap-4 md:grid-cols-3">
 
             {cards.map((metric) => {
+
               const Icon = metric.icon
 
               return (
+
                 <div
                   key={metric.label}
-                  className="bg-[#090a0a] p-5"
+                  className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]"
                 >
 
                   <div className="flex items-start justify-between">
 
                     <div className="flex items-center gap-3">
 
-                      <div className="flex size-9 items-center justify-center border border-[#292c2c] bg-[#0d0f0f]">
-                        <Icon className="size-4 text-[#737875]" />
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-[#eff6ff]">
+
+                        <Icon className="size-4 text-[#2563eb]" />
+
                       </div>
 
                       <div>
 
-                        <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#d9dcd9]">
+                        <div className="text-sm font-semibold text-[#172033]">
                           {metric.label}
                         </div>
 
-                        <div className="mt-1 font-mono text-[7px] uppercase tracking-[0.1em] text-[#3f4441]">
+                        <div className="mt-0.5 text-xs text-[#98a2b3]">
                           {metric.description}
                         </div>
 
@@ -349,8 +399,17 @@ export default function MonitoringPage() {
 
                     </div>
 
+
                     {stats && (
-                      <Activity className="size-3.5 text-[#b7ff4a]" />
+
+                      <div className="flex items-center gap-1.5 rounded-full bg-[#ecfdf3] px-2 py-1 text-[10px] font-medium text-[#15803d]">
+
+                        <span className="size-1.5 rounded-full bg-[#16a34a]" />
+
+                        Live
+
+                      </div>
+
                     )}
 
                   </div>
@@ -358,28 +417,46 @@ export default function MonitoringPage() {
 
                   <div className="mt-8">
 
-                    <div className="font-mono text-4xl font-medium tracking-[-0.04em] text-[#e8e8e3]">
-                      {metric.value}
-                    </div>
+                    <div className="flex items-end justify-between gap-4">
 
-                    <div className="mt-3 font-mono text-[8px] text-[#4f5452]">
-                      {metric.detail}
-                    </div>
-
-                    {stats && (
-                      <div className="mt-5 h-px bg-[#292c2c]">
-                        <div
-                          className="h-px bg-[#b7ff4a] transition-all duration-500"
-                          style={{
-                            width: `${metric.percentage}%`,
-                          }}
-                        />
+                      <div className="font-mono text-3xl font-medium tracking-[-0.04em] text-[#172033]">
+                        {metric.value}
                       </div>
-                    )}
+
+                      <div className="text-right text-[11px] text-[#98a2b3]">
+                        {metric.detail}
+                      </div>
+
+                    </div>
+
+
+                    <div className="mt-5 h-2 overflow-hidden rounded-full bg-[#eef2f7]">
+
+                      <div
+                        className={`
+                          h-full
+                          rounded-full
+                          transition-all
+                          duration-500
+                          ${
+                            metric.percentage >= 85
+                              ? "bg-[#dc2626]"
+                              : metric.percentage >= 70
+                                ? "bg-[#d99a16]"
+                                : "bg-[#2563eb]"
+                          }
+                        `}
+                        style={{
+                          width: `${metric.percentage}%`,
+                        }}
+                      />
+
+                    </div>
 
                   </div>
 
                 </div>
+
               )
             })}
 
@@ -392,65 +469,192 @@ export default function MonitoringPage() {
 
         <section>
 
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-4">
 
-            <span className="font-mono text-[8px] uppercase tracking-[0.15em] text-[#4f5452]">
-              Network interface
-            </span>
+            <h2 className="text-lg font-semibold tracking-tight text-[#172033]">
+              Network
+            </h2>
 
-            <span className="font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
-              Live traffic
-            </span>
+            <p className="mt-1 text-xs text-[#98a2b3]">
+              Current traffic calculated from server interface counters.
+            </p>
 
           </div>
 
-          <div className="border border-[#292c2c] bg-[#090a0a]">
 
-            <div className="grid md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
 
-              <div className="border-b border-[#292c2c] p-5 md:border-b-0 md:border-r">
+            {/* DOWNLOAD */}
 
-                <div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.15em] text-[#4f5452]">
-                  <ArrowDown className="size-3.5 text-[#b7ff4a]" />
-                  Download
+            <div className="rounded-xl border border-[#e4e8ef] bg-white p-6 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+              <div className="flex items-start justify-between">
+
+                <div>
+
+                  <div className="flex items-center gap-2 text-sm font-medium text-[#344054]">
+
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-[#eff6ff]">
+
+                      <ArrowDown className="size-4 text-[#2563eb]" />
+
+                    </div>
+
+                    Download
+
+                  </div>
+
+                  <div className="mt-1 text-xs text-[#98a2b3]">
+                    Incoming traffic
+                  </div>
+
                 </div>
 
-                <div className="mt-6 font-mono text-3xl font-medium tracking-[-0.04em] text-[#e8e8e3]">
-                  {stats
-                    ? formatSpeed(networkSpeed.rx)
-                    : "—"}
-                </div>
 
-                <div className="mt-2 font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
-                  RX / Interface aggregate
-                </div>
+                <Network className="size-4 text-[#98a2b3]" />
 
               </div>
 
 
-              <div className="p-5">
+              <div className="mt-8 font-mono text-3xl font-medium tracking-[-0.04em] text-[#172033]">
 
-                <div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.15em] text-[#4f5452]">
-                  <ArrowUp className="size-3.5 text-[#b7ff4a]" />
-                  Upload
-                </div>
+                {stats
+                  ? formatSpeed(networkSpeed.rx)
+                  : "—"}
 
-                <div className="mt-6 font-mono text-3xl font-medium tracking-[-0.04em] text-[#e8e8e3]">
-                  {stats
-                    ? formatSpeed(networkSpeed.tx)
-                    : "—"}
-                </div>
+              </div>
 
-                <div className="mt-2 font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
-                  TX / Interface aggregate
-                </div>
 
+              <div className="mt-2 text-xs text-[#98a2b3]">
+                RX / interface aggregate
               </div>
 
             </div>
 
-            <div className="border-t border-[#292c2c] px-5 py-3 font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
-              Calculated from live server interface counters.
+
+            {/* UPLOAD */}
+
+            <div className="rounded-xl border border-[#e4e8ef] bg-white p-6 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+              <div className="flex items-start justify-between">
+
+                <div>
+
+                  <div className="flex items-center gap-2 text-sm font-medium text-[#344054]">
+
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-[#f7f9fc]">
+
+                      <ArrowUp className="size-4 text-[#667085]" />
+
+                    </div>
+
+                    Upload
+
+                  </div>
+
+                  <div className="mt-1 text-xs text-[#98a2b3]">
+                    Outgoing traffic
+                  </div>
+
+                </div>
+
+
+                <Network className="size-4 text-[#98a2b3]" />
+
+              </div>
+
+
+              <div className="mt-8 font-mono text-3xl font-medium tracking-[-0.04em] text-[#172033]">
+
+                {stats
+                  ? formatSpeed(networkSpeed.tx)
+                  : "—"}
+
+              </div>
+
+
+              <div className="mt-2 text-xs text-[#98a2b3]">
+                TX / interface aggregate
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        {/* SERVER DETAILS */}
+
+        <section className="rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+          <div className="border-b border-[#eef1f5] px-5 py-4">
+
+            <h2 className="text-sm font-semibold text-[#172033]">
+              Monitoring details
+            </h2>
+
+            <p className="mt-1 text-xs text-[#98a2b3]">
+              Information about the current telemetry session.
+            </p>
+
+          </div>
+
+
+          <div className="grid sm:grid-cols-3">
+
+            <div className="border-b border-[#eef1f5] p-5 sm:border-b-0 sm:border-r">
+
+              <div className="text-xs text-[#98a2b3]">
+                Data source
+              </div>
+
+              <div className="mt-2 text-sm font-medium text-[#344054]">
+                JCloud server
+              </div>
+
+            </div>
+
+
+            <div className="border-b border-[#eef1f5] p-5 sm:border-b-0 sm:border-r">
+
+              <div className="text-xs text-[#98a2b3]">
+                Update frequency
+              </div>
+
+              <div className="mt-2 text-sm font-medium text-[#344054]">
+                Every 5 seconds
+              </div>
+
+            </div>
+
+
+            <div className="p-5">
+
+              <div className="text-xs text-[#98a2b3]">
+                Connection
+              </div>
+
+              <div className="mt-2 flex items-center gap-2 text-sm font-medium text-[#344054]">
+
+                <span
+                  className={`size-1.5 rounded-full ${
+                    error
+                      ? "bg-[#dc2626]"
+                      : stats
+                        ? "bg-[#16a34a]"
+                        : "bg-[#d99a16]"
+                  }`}
+                />
+
+                {error
+                  ? "Unavailable"
+                  : stats
+                    ? "Connected"
+                    : "Connecting"}
+
+              </div>
+
             </div>
 
           </div>
@@ -460,27 +664,19 @@ export default function MonitoringPage() {
 
         {/* FOOTER */}
 
-        <div className="flex flex-col justify-between gap-2 border-t border-[#292c2c] pt-4 font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441] sm:flex-row">
+        <footer className="flex flex-col gap-2 border-t border-[#e4e8ef] py-5 text-xs text-[#98a2b3] sm:flex-row sm:items-center sm:justify-between">
 
           <span>
-            JCLOUD / MONITORING CONTROL
-          </span>
-
-          <span>
-            {error
-              ? "SERVER OFFLINE"
-              : stats
-                ? "SERVER ONLINE"
-                : "CONNECTING..."}
+            JCloud · Infrastructure monitoring
           </span>
 
           <span>
             {lastUpdated
-              ? `UPDATED ${lastUpdated.toLocaleTimeString()}`
-              : "WAITING FOR TELEMETRY"}
+              ? `Updated ${lastUpdated.toLocaleTimeString()}`
+              : "Waiting for telemetry"}
           </span>
 
-        </div>
+        </footer>
 
       </div>
     </JCloudShell>

@@ -28,6 +28,10 @@ async function request<T>(
     throw new Error(message)
   }
 
+  if (response.status === 204) {
+    return undefined as T
+  }
+
   return response.json()
 }
 
@@ -42,7 +46,6 @@ export type UserProfile = {
 }
 
 export const authApi = {
-
   login(
     username: string,
     password: string
@@ -76,9 +79,7 @@ export const authApi = {
     )
   },
 
-  avatarUrl(
-    size = 64
-  ) {
+  avatarUrl(size = 64) {
     return `${API_URL}/auth/avatar?size=${size}`
   },
 }
@@ -96,7 +97,6 @@ export type StorageItem = {
 }
 
 export const storageApi = {
-
   list(path = "") {
     return request<StorageItem[]>(
       `/storage/files?path=${encodeURIComponent(path)}`
@@ -128,7 +128,6 @@ export const storageApi = {
         body: formData,
       }
     ).then(async (response) => {
-
       if (!response.ok) {
         let message =
           `JCloud API error: ${response.status}`
@@ -167,7 +166,6 @@ export const storageApi = {
         body: formData,
       }
     ).then(async (response) => {
-
       if (!response.ok) {
         let message =
           `JCloud API error: ${response.status}`
@@ -262,7 +260,6 @@ export const storageApi = {
 /* ==================== MONITORING ==================== */
 
 export const monitoringApi = {
-
   system() {
     return request<{
       cpu: {
@@ -365,17 +362,13 @@ export type Machine = {
   id: string
   name: string
   display_name: string
-
   state: MachinePowerState
   state_code: number | null
   reason: number | null
-
   uuid: string | null
-
   vcpus: number
   memory_mb: number
   disk_gb: number
-
   lifecycle_state: MachineLifecycleState
   owner: string | null
   claimed_at: string | null
@@ -387,7 +380,6 @@ export type MachinesResponse = {
 }
 
 export const machinesApi = {
-
   list() {
     return request<MachinesResponse>(
       "/machines"
@@ -468,22 +460,69 @@ export const machinesApi = {
 
 /* ==================== APPLICATIONS ==================== */
 
-export const applicationsApi = {
+export type ApplicationPort = {
+  container: string
+  host_ip: string | null
+  host: string | null
+}
 
+export type Application = {
+  id: string
+  name: string
+  image: string
+  status: string
+  state: string
+  created: string
+  ports: ApplicationPort[]
+  labels: Record<string, string>
+}
+
+export type ApplicationStats = {
+  application_id: string
+  cpu_percent: number
+  memory_usage: number
+  memory_limit: number
+  memory_percent: number
+}
+
+export type ApplicationLogs = {
+  application_id: string
+  logs: string
+}
+
+export type DeployApplicationData = {
+  name: string
+  image: string
+  command: string[] | null
+  environment: Record<string, string>
+  ports: Array<{
+    container: string
+    host: number
+  }>
+  cpu_limit: number | null
+  memory_limit: string | null
+  restart_policy:
+    | "no"
+    | "always"
+    | "on-failure"
+    | "unless-stopped"
+}
+
+export const applicationsApi = {
   list() {
-    return request(
+    return request<Application[]>(
       "/applications"
     )
   },
 
   get(id: string) {
-    return request(
-      `/applications/${id}`
+    return request<Application>(
+      `/applications/${encodeURIComponent(id)}`
     )
   },
 
-  create(data: unknown) {
-    return request(
+  create(data: DeployApplicationData) {
+    return request<Application>(
       "/applications",
       {
         method: "POST",
@@ -495,9 +534,51 @@ export const applicationsApi = {
     )
   },
 
+  start(id: string) {
+    return request<Application>(
+      `/applications/${encodeURIComponent(id)}/start`,
+      {
+        method: "POST",
+      }
+    )
+  },
+
+  stop(id: string) {
+    return request<Application>(
+      `/applications/${encodeURIComponent(id)}/stop`,
+      {
+        method: "POST",
+      }
+    )
+  },
+
+  restart(id: string) {
+    return request<Application>(
+      `/applications/${encodeURIComponent(id)}/restart`,
+      {
+        method: "POST",
+      }
+    )
+  },
+
+  logs(
+    id: string,
+    tail = 200
+  ) {
+    return request<ApplicationLogs>(
+      `/applications/${encodeURIComponent(id)}/logs?tail=${tail}`
+    )
+  },
+
+  stats(id: string) {
+    return request<ApplicationStats>(
+      `/applications/${encodeURIComponent(id)}/stats`
+    )
+  },
+
   delete(id: string) {
-    return request(
-      `/applications/${id}`,
+    return request<void>(
+      `/applications/${encodeURIComponent(id)}`,
       {
         method: "DELETE",
       }
@@ -509,7 +590,6 @@ export const applicationsApi = {
 /* ==================== DATABASES ==================== */
 
 export const databasesApi = {
-
   list() {
     return request(
       "/databases"
@@ -518,7 +598,7 @@ export const databasesApi = {
 
   get(id: string) {
     return request(
-      `/databases/${id}`
+      `/databases/${encodeURIComponent(id)}`
     )
   },
 
@@ -537,7 +617,7 @@ export const databasesApi = {
 
   delete(id: string) {
     return request(
-      `/databases/${id}`,
+      `/databases/${encodeURIComponent(id)}`,
       {
         method: "DELETE",
       }

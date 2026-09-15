@@ -74,17 +74,17 @@ function lifecycleDotClass(
 ) {
   switch (state) {
     case "AVAILABLE":
-      return "bg-[#b7ff4a]"
+      return "bg-[#16a34a]"
     case "STARTING":
-      return "bg-[#d7b85c]"
+      return "bg-[#d99a16]"
     case "IN_USE":
-      return "bg-[#6fa8ff]"
+      return "bg-[#2563eb]"
     case "RESETTING":
-      return "bg-[#c78cff]"
+      return "bg-[#9333ea]"
     case "ERROR":
-      return "bg-[#ff6868]"
+      return "bg-[#dc2626]"
     default:
-      return "bg-[#4f5452]"
+      return "bg-[#98a2b3]"
   }
 }
 
@@ -94,17 +94,17 @@ function lifecycleTextClass(
 ) {
   switch (state) {
     case "AVAILABLE":
-      return "text-[#b7ff4a]"
+      return "text-[#15803d]"
     case "STARTING":
-      return "text-[#d7b85c]"
+      return "text-[#a16207]"
     case "IN_USE":
-      return "text-[#6fa8ff]"
+      return "text-[#2563eb]"
     case "RESETTING":
-      return "text-[#c78cff]"
+      return "text-[#7e22ce]"
     case "ERROR":
-      return "text-[#ff6868]"
+      return "text-[#b42318]"
     default:
-      return "text-[#4f5452]"
+      return "text-[#667085]"
   }
 }
 
@@ -498,66 +498,30 @@ export default function MachinesPage() {
   return (
     <JCloudShell>
 
-      <div className="space-y-8">
+      <div className="mx-auto w-full max-w-[1500px] space-y-8">
 
         {/* HEADER */}
 
-        <section
-          className="
-            flex
-            flex-col
-            justify-between
-            gap-6
-            border-b
-            border-[#292c2c]
-            pb-8
-            lg:flex-row
-            lg:items-end
-          "
-        >
+        <section className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
 
           <div>
 
-            <div
-              className="
-                flex
-                items-center
-                gap-3
-                font-mono
-                text-[8px]
-                uppercase
-                tracking-[0.18em]
-                text-[#4f5452]
-              "
-            >
-              <span className="size-1.5 bg-[#b7ff4a]" />
+            <div className="flex items-center gap-2 text-xs font-medium text-[#667085]">
 
-              Virtualization / Compute
+              <div className="flex size-7 items-center justify-center rounded-lg bg-[#eff6ff]">
+                <Monitor className="size-3.5 text-[#2563eb]" />
+              </div>
+
+              Compute
+
             </div>
 
-            <h2
-              className="
-                mt-4
-                text-5xl
-                font-medium
-                tracking-[-0.045em]
-              "
-            >
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-[#172033] sm:text-4xl">
               Machines
-            </h2>
+            </h1>
 
-            <p
-              className="
-                mt-3
-                max-w-lg
-                font-mono
-                text-[9px]
-                leading-5
-                text-[#4f5452]
-              "
-            >
-              Access fixed virtual computers
-              running on JCloud.
+            <p className="mt-2 max-w-xl text-sm text-[#667085]">
+              Access the virtual computers running on your private infrastructure.
             </p>
 
           </div>
@@ -571,16 +535,17 @@ export default function MachinesPage() {
             }
             className="
               h-10
-              rounded-none
-              border-[#353a37]
-              bg-[#0b0d0d]
+              rounded-lg
+              border-[#d0d5dd]
+              bg-white
               px-4
-              font-mono
-              text-[9px]
-              uppercase
-              tracking-[0.1em]
-              hover:bg-[#151717]
-              hover:text-[#e8e8e3]
+              text-sm
+              font-medium
+              text-[#344054]
+              shadow-sm
+              transition
+              hover:bg-[#f7f9fc]
+              hover:text-[#172033]
             "
           >
 
@@ -588,17 +553,17 @@ export default function MachinesPage() {
               <Loader2
                 className="
                   mr-2
-                  size-3.5
+                  size-4
                   animate-spin
                 "
               />
             ) : (
               <RefreshCw
-                className="mr-2 size-3.5"
+                className="mr-2 size-4"
               />
             )}
 
-            Refresh fleet
+            Refresh
 
           </Button>
 
@@ -607,302 +572,242 @@ export default function MachinesPage() {
 
         {/* FLEET SUMMARY */}
 
-        <div
-          className="
-            grid
-            grid-cols-2
-            border-y
-            border-[#292c2c]
-            sm:grid-cols-4
-          "
-        >
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-          <div
-            className="
-              border-r
-              border-[#292c2c]
-              px-5
-              py-4
-            "
-          >
-            <div
-              className="
-                font-mono
-                text-[7px]
-                uppercase
-                tracking-[0.16em]
-                text-[#4f5452]
-              "
-            >
-              Provider
+          {/* TOTAL */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="flex items-start justify-between">
+
+              <div>
+
+                <div className="text-xs font-medium text-[#667085]">
+                  Machines
+                </div>
+
+                <div className="mt-3 text-2xl font-semibold tracking-tight text-[#172033]">
+                  {loading
+                    ? "--"
+                    : machines.length}
+                </div>
+
+              </div>
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#eff6ff]">
+                <Server className="size-4 text-[#2563eb]" />
+              </div>
+
             </div>
 
-            <div
-              className="
-                mt-2
-                font-mono
-                text-[9px]
-                uppercase
-              "
-            >
-              Libvirt / QEMU
+            <div className="mt-2 text-xs text-[#98a2b3]">
+              Fixed virtual machines
             </div>
+
           </div>
 
 
-          <div
-            className="
-              border-r
-              border-[#292c2c]
-              px-5
-              py-4
-            "
-          >
-            <div
-              className="
-                font-mono
-                text-[7px]
-                uppercase
-                tracking-[0.16em]
-                text-[#4f5452]
-              "
-            >
-              Fleet
+          {/* AVAILABLE */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="flex items-start justify-between">
+
+              <div>
+
+                <div className="text-xs font-medium text-[#667085]">
+                  Available
+                </div>
+
+                <div className="mt-3 text-2xl font-semibold tracking-tight text-[#172033]">
+                  {loading
+                    ? "--"
+                    : availableCount}
+                </div>
+
+              </div>
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#ecfdf3]">
+                <Check className="size-4 text-[#16a34a]" />
+              </div>
+
             </div>
 
-            <div
-              className="
-                mt-2
-                font-mono
-                text-[9px]
-              "
-            >
-              {loading
-                ? "--"
-                : String(
-                    machines.length
-                  ).padStart(2, "0")
-              }
+            <div className="mt-2 text-xs text-[#98a2b3]">
+              Ready to claim
             </div>
+
           </div>
 
 
-          <div
-            className="
-              border-r
-              border-[#292c2c]
-              px-5
-              py-4
-            "
-          >
-            <div
-              className="
-                font-mono
-                text-[7px]
-                uppercase
-                tracking-[0.16em]
-                text-[#4f5452]
-              "
-            >
-              Available
+          {/* IN USE */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="flex items-start justify-between">
+
+              <div>
+
+                <div className="text-xs font-medium text-[#667085]">
+                  In use
+                </div>
+
+                <div className="mt-3 text-2xl font-semibold tracking-tight text-[#172033]">
+                  {loading
+                    ? "--"
+                    : inUseCount}
+                </div>
+
+              </div>
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#eff6ff]">
+                <Activity className="size-4 text-[#2563eb]" />
+              </div>
+
             </div>
 
-            <div
-              className="
-                mt-2
-                flex
-                items-center
-                gap-2
-                font-mono
-                text-[9px]
-                uppercase
-              "
-            >
-              <span
-                className="
-                  size-1.5
-                  bg-[#b7ff4a]
-                "
-              />
-
-              {loading
-                ? "--"
-                : String(
-                    availableCount
-                  ).padStart(2, "0")
-              }
+            <div className="mt-2 text-xs text-[#98a2b3]">
+              Currently reserved
             </div>
+
           </div>
 
 
-          <div className="px-5 py-4">
-            <div
-              className="
-                font-mono
-                text-[7px]
-                uppercase
-                tracking-[0.16em]
-                text-[#4f5452]
-              "
-            >
-              Compute
+          {/* RESETTING */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="flex items-start justify-between">
+
+              <div>
+
+                <div className="text-xs font-medium text-[#667085]">
+                  Resetting
+                </div>
+
+                <div className="mt-3 text-2xl font-semibold tracking-tight text-[#172033]">
+                  {loading
+                    ? "--"
+                    : resettingCount}
+                </div>
+
+              </div>
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#faf5ff]">
+                <RotateCcw className="size-4 text-[#9333ea]" />
+              </div>
+
             </div>
 
-            <div
-              className="
-                mt-2
-                font-mono
-                text-[9px]
-                uppercase
-              "
-            >
-              8 vCPU / 16 GiB
+            <div className="mt-2 text-xs text-[#98a2b3]">
+              Restoring clean image
             </div>
+
           </div>
 
-        </div>
+        </section>
 
 
         {/* ERROR */}
 
         {error && (
-          <div
-            className="
-              flex
-              items-center
-              justify-between
-              gap-4
-              border
-              border-[#4a2727]
-              bg-[#130b0b]
-              px-4
-              py-3
-            "
-          >
 
-            <div
-              className="
-                flex
-                items-center
-                gap-3
-                font-mono
-                text-[8px]
-                uppercase
-                tracking-[0.08em]
-                text-[#ff8585]
-              "
-            >
-              <X className="size-3.5" />
-              {error}
+          <div className="flex items-start justify-between gap-4 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3">
+
+            <div className="flex items-start gap-3">
+
+              <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-white">
+
+                <X className="size-3.5 text-[#dc2626]" />
+
+              </div>
+
+              <div>
+
+                <div className="text-xs font-semibold text-[#b42318]">
+                  Something went wrong
+                </div>
+
+                <div className="mt-1 text-xs leading-5 text-[#b42318]/80">
+                  {error}
+                </div>
+
+              </div>
+
             </div>
+
 
             <button
               type="button"
               onClick={() =>
                 setError(null)
               }
-              className="
-                font-mono
-                text-[8px]
-                uppercase
-                text-[#4f5452]
-                hover:text-[#e8e8e3]
-              "
+              className="rounded-md p-1 text-[#b42318]/60 transition hover:bg-white hover:text-[#b42318]"
+              aria-label="Dismiss error"
             >
-              Dismiss
+              <X className="size-4" />
             </button>
 
           </div>
+
         )}
 
 
-        {/* MACHINES */}
+        {/* MACHINE LIST */}
 
         <section>
 
-          <div
-            className="
-              mb-3
-              flex
-              items-center
-              justify-between
-            "
-          >
-            <span
-              className="
-                font-mono
-                text-[8px]
-                uppercase
-                tracking-[0.15em]
-                text-[#4f5452]
-              "
-            >
-              Virtual machines
+          <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+
+            <div>
+
+              <h2 className="text-lg font-semibold tracking-tight text-[#172033]">
+                Virtual machines
+              </h2>
+
+              <p className="mt-1 text-xs text-[#98a2b3]">
+                Each machine provides a fixed development environment.
+              </p>
+
+            </div>
+
+            <span className="text-xs text-[#98a2b3]">
+              {loading
+                ? "Loading..."
+                : `${machines.length} machines`}
             </span>
 
-            <span
-              className="
-                font-mono
-                text-[7px]
-                uppercase
-                tracking-[0.12em]
-                text-[#3f4441]
-              "
-            >
-              {loading
-                ? "Loading fleet"
-                : `${machines.length} fixed instances`
-              }
-            </span>
           </div>
 
 
-          <div
-            className="
-              border
-              border-[#292c2c]
-              bg-[#090a0a]
-            "
-          >
+          <div className="overflow-hidden rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
 
             {/* LOADING */}
 
             {loading && (
-              <div
-                className="
-                  flex
-                  min-h-[420px]
-                  items-center
-                  justify-center
-                "
-              >
+
+              <div className="flex min-h-[420px] items-center justify-center px-6 py-16">
+
                 <div className="text-center">
 
-                  <Loader2
-                    className="
-                      mx-auto
-                      size-5
-                      animate-spin
-                      text-[#4f5452]
-                    "
-                  />
+                  <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-[#eff6ff]">
 
-                  <div
-                    className="
-                      mt-5
-                      font-mono
-                      text-[8px]
-                      uppercase
-                      tracking-[0.14em]
-                      text-[#4f5452]
-                    "
-                  >
-                    Connecting to machine
-                    control
+                    <Loader2 className="size-5 animate-spin text-[#2563eb]" />
+
                   </div>
 
+                  <div className="mt-5 text-sm font-medium text-[#344054]">
+                    Loading machines
+                  </div>
+
+                  <p className="mt-1 text-xs text-[#98a2b3]">
+                    Connecting to the JCloud compute service.
+                  </p>
+
                 </div>
+
               </div>
+
             )}
 
 
@@ -910,70 +815,53 @@ export default function MachinesPage() {
 
             {!loading &&
               machines.length === 0 && (
-                <div
-                  className="
-                    flex
-                    min-h-[420px]
-                    items-center
-                    justify-center
-                    p-8
-                  "
-                >
-                  <div
-                    className="
-                      max-w-md
-                      text-center
-                    "
-                  >
 
-                    <div
-                      className="
-                        mx-auto
-                        flex
-                        size-14
-                        items-center
-                        justify-center
-                        border
-                        border-[#292c2c]
-                      "
-                    >
-                      <Monitor
-                        className="
-                          size-5
-                          text-[#4f5452]
-                        "
-                      />
+                <div className="flex min-h-[420px] items-center justify-center px-6 py-16">
+
+                  <div className="max-w-md text-center">
+
+                    <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[#eff6ff]">
+
+                      <Monitor className="size-6 text-[#2563eb]" />
+
                     </div>
 
-                    <div
-                      className="
-                        mt-6
-                        font-mono
-                        text-[9px]
-                        uppercase
-                        tracking-[0.14em]
-                        text-[#e8e8e3]
-                      "
-                    >
-                      Machine fleet unavailable
-                    </div>
+                    <h3 className="mt-6 text-base font-semibold text-[#172033]">
+                      No machines available
+                    </h3>
 
-                    <p
-                      className="
-                        mt-3
-                        font-mono
-                        text-[8px]
-                        leading-5
-                        text-[#4f5452]
-                      "
-                    >
-                      The JCloud virtualization
-                      service did not return any
-                      machines.
+                    <p className="mt-2 text-sm leading-6 text-[#667085]">
+                      The JCloud virtualization service
+                      did not return any machines.
                     </p>
 
+                    <Button
+                      variant="outline"
+                      disabled={refreshing}
+                      onClick={() =>
+                        loadMachines(true)
+                      }
+                      className="
+                        mt-6
+                        h-10
+                        rounded-lg
+                        border-[#d0d5dd]
+                        bg-white
+                        px-4
+                        text-sm
+                        font-medium
+                        text-[#344054]
+                        hover:bg-[#f7f9fc]
+                      "
+                    >
+                      <RefreshCw className="mr-2 size-4" />
+                      Try again
+                    </Button>
+
                   </div>
+
                 </div>
+
               )}
 
 
@@ -981,6 +869,7 @@ export default function MachinesPage() {
 
             {!loading &&
               machines.length > 0 && (
+
                 <div>
 
                   {machines.map(
@@ -1011,19 +900,27 @@ export default function MachinesPage() {
                           machine.lease_expires_at
                         )
 
+                      const isAvailable =
+                        machine.lifecycle_state ===
+                        "AVAILABLE"
+
+                      const isError =
+                        machine.lifecycle_state ===
+                        "ERROR"
+
                       return (
+
                         <article
                           key={machine.id}
                           className={`
-                            group
                             border-b
-                            border-[#292c2c]
+                            border-[#eef1f5]
                             p-5
                             last:border-b-0
+                            sm:p-6
                             ${
-                              machine.lifecycle_state ===
-                              "ERROR"
-                                ? "bg-[#100909]"
+                              isError
+                                ? "bg-[#fffafa]"
                                 : ""
                             }
                           `}
@@ -1031,99 +928,34 @@ export default function MachinesPage() {
 
                           {/* MACHINE HEADER */}
 
-                          <div
-                            className="
-                              flex
-                              flex-col
-                              gap-5
-                              lg:flex-row
-                              lg:items-start
-                              lg:justify-between
-                            "
-                          >
+                          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
 
-                            <div
-                              className="
-                                flex
-                                min-w-0
-                                items-start
-                                gap-4
-                              "
-                            >
+                            <div className="flex min-w-0 items-start gap-4">
 
-                              <div
-                                className="
-                                  flex
-                                  size-11
-                                  shrink-0
-                                  items-center
-                                  justify-center
-                                  border
-                                  border-[#292c2c]
-                                  bg-[#0b0d0d]
-                                "
-                              >
-                                <Server
-                                  className="
-                                    size-4
-                                    text-[#686d69]
-                                  "
-                                />
+                              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#f7f9fc]">
+
+                                <Server className="size-5 text-[#667085]" />
+
                               </div>
 
 
                               <div className="min-w-0">
 
-                                <div
-                                  className="
-                                    flex
-                                    flex-wrap
-                                    items-center
-                                    gap-3
-                                  "
-                                >
+                                <div className="flex flex-wrap items-center gap-2">
 
-                                  <h3
-                                    className="
-                                      font-mono
-                                      text-[11px]
-                                      uppercase
-                                      tracking-[0.08em]
-                                      text-[#e8e8e3]
-                                    "
-                                  >
-                                    {
-                                      machine.display_name
-                                    }
+                                  <h3 className="text-base font-semibold tracking-tight text-[#172033]">
+                                    {machine.display_name}
                                   </h3>
 
-                                  <span
-                                    className="
-                                      font-mono
-                                      text-[7px]
-                                      uppercase
-                                      tracking-[0.12em]
-                                      text-[#3f4441]
-                                    "
-                                  >
-                                    {
-                                      machine.id
-                                    }
+                                  <span className="rounded-md bg-[#f2f4f7] px-2 py-1 font-mono text-[10px] text-[#667085]">
+                                    {machine.id}
                                   </span>
 
                                 </div>
 
-                                <div
-                                  className="
-                                    mt-2
-                                    font-mono
-                                    text-[8px]
-                                    text-[#4f5452]
-                                  "
-                                >
-                                  {
-                                    machine.name
-                                  }
+
+                                <div className="mt-1 text-xs text-[#98a2b3]">
+                                  {machine.name}
                                 </div>
 
                               </div>
@@ -1131,353 +963,230 @@ export default function MachinesPage() {
                             </div>
 
 
-                            {/* LIFECYCLE */}
+                            {/* STATUS */}
 
                             <div
-                              className="
-                                flex
+                              className={`
+                                inline-flex
+                                w-fit
                                 items-center
-                                gap-3
-                              "
-                            >
-
-                              <div
-                                className={`
-                                  flex
-                                  items-center
-                                  gap-2
-                                  border
-                                  border-[#292c2c]
-                                  bg-[#0b0d0d]
-                                  px-3
-                                  py-2
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  ${lifecycleTextClass(
-                                    machine.lifecycle_state
-                                  )}
-                                `}
-                              >
-
-                                {machine.lifecycle_state ===
-                                "STARTING" ||
-                                machine.lifecycle_state ===
-                                "RESETTING" ? (
-                                  <Loader2
-                                    className="
-                                      size-3
-                                      animate-spin
-                                    "
-                                  />
-                                ) : (
-                                  <span
-                                    className={`
-                                      size-1.5
-                                      ${lifecycleDotClass(
-                                        machine.lifecycle_state
-                                      )}
-                                    `}
-                                  />
+                                gap-2
+                                rounded-full
+                                border
+                                px-3
+                                py-1.5
+                                text-xs
+                                font-medium
+                                ${lifecycleTextClass(
+                                  machine.lifecycle_state
                                 )}
-
-                                {
-                                  lifecycleLabel(
-                                    machine.lifecycle_state
-                                  )
+                                ${
+                                  machine.lifecycle_state ===
+                                  "AVAILABLE"
+                                    ? "border-[#bbf7d0] bg-[#f0fdf4]"
+                                    : machine.lifecycle_state ===
+                                      "STARTING"
+                                      ? "border-[#fde68a] bg-[#fffbeb]"
+                                      : machine.lifecycle_state ===
+                                        "IN_USE"
+                                        ? "border-[#bfdbfe] bg-[#eff6ff]"
+                                        : machine.lifecycle_state ===
+                                          "RESETTING"
+                                          ? "border-[#e9d5ff] bg-[#faf5ff]"
+                                          : machine.lifecycle_state ===
+                                            "ERROR"
+                                            ? "border-[#fecaca] bg-[#fef2f2]"
+                                            : "border-[#e4e8ef] bg-[#f7f9fc]"
                                 }
-
-                              </div>
-
-                            </div>
-
-                          </div>
-
-
-                          {/* RESOURCE GRID */}
-
-                          <div
-                            className="
-                              mt-6
-                              grid
-                              grid-cols-2
-                              border-y
-                              border-[#292c2c]
-                              sm:grid-cols-4
-                            "
-                          >
-
-                            <div
-                              className="
-                                border-r
-                                border-[#292c2c]
-                                px-4
-                                py-4
-                              "
+                              `}
                             >
-                              <div
-                                className="
-                                  flex
-                                  items-center
-                                  gap-2
-                                  font-mono
-                                  text-[7px]
-                                  uppercase
-                                  tracking-[0.12em]
-                                  text-[#4f5452]
-                                "
-                              >
-                                <Cpu className="size-3" />
-                                vCPU
-                              </div>
 
-                              <div
-                                className="
-                                  mt-2
-                                  font-mono
-                                  text-[10px]
-                                "
-                              >
-                                {
-                                  machine.vcpus
-                                }
-                              </div>
-                            </div>
-
-
-                            <div
-                              className="
-                                border-r
-                                border-[#292c2c]
-                                px-4
-                                py-4
-                              "
-                            >
-                              <div
-                                className="
-                                  flex
-                                  items-center
-                                  gap-2
-                                  font-mono
-                                  text-[7px]
-                                  uppercase
-                                  tracking-[0.12em]
-                                  text-[#4f5452]
-                                "
-                              >
-                                <MemoryStick className="size-3" />
-                                RAM
-                              </div>
-
-                              <div
-                                className="
-                                  mt-2
-                                  font-mono
-                                  text-[10px]
-                                "
-                              >
-                                {
-                                  machine.memory_mb /
-                                  1024
-                                } GiB
-                              </div>
-                            </div>
-
-
-                            <div
-                              className="
-                                border-r
-                                border-[#292c2c]
-                                px-4
-                                py-4
-                              "
-                            >
-                              <div
-                                className="
-                                  flex
-                                  items-center
-                                  gap-2
-                                  font-mono
-                                  text-[7px]
-                                  uppercase
-                                  tracking-[0.12em]
-                                  text-[#4f5452]
-                                "
-                              >
-                                <HardDrive className="size-3" />
-                                Disk
-                              </div>
-
-                              <div
-                                className="
-                                  mt-2
-                                  font-mono
-                                  text-[10px]
-                                "
-                              >
-                                {
-                                  machine.disk_gb
-                                } GiB
-                              </div>
-                            </div>
-
-
-                            <div className="px-4 py-4">
-                              <div
-                                className="
-                                  flex
-                                  items-center
-                                  gap-2
-                                  font-mono
-                                  text-[7px]
-                                  uppercase
-                                  tracking-[0.12em]
-                                  text-[#4f5452]
-                                "
-                              >
-                                <Power className="size-3" />
-                                Power
-                              </div>
-
-                              <div
-                                className="
-                                  mt-2
-                                  flex
-                                  items-center
-                                  gap-2
-                                  font-mono
-                                  text-[9px]
-                                  uppercase
-                                "
-                              >
-
+                              {machine.lifecycle_state ===
+                                "STARTING" ||
+                              machine.lifecycle_state ===
+                                "RESETTING" ? (
+                                <Loader2 className="size-3.5 animate-spin" />
+                              ) : (
                                 <span
                                   className={`
                                     size-1.5
-                                    ${
-                                      machine.state ===
-                                      "running"
-                                        ? "bg-[#b7ff4a]"
-                                        : "bg-[#4f5452]"
-                                    }
+                                    rounded-full
+                                    ${lifecycleDotClass(
+                                      machine.lifecycle_state
+                                    )}
                                   `}
                                 />
+                              )}
 
-                                {
-                                  machine.state
-                                }
+                              {lifecycleLabel(
+                                machine.lifecycle_state
+                              )}
 
-                              </div>
                             </div>
 
                           </div>
 
 
-                          {/* OWNERSHIP / LEASE */}
+                          {/* RESOURCES */}
 
-                          <div
-                            className="
-                              mt-4
-                              flex
-                              flex-col
-                              gap-3
-                              sm:flex-row
-                              sm:items-center
-                              sm:justify-between
-                            "
-                          >
+                          <div className="mt-6 grid overflow-hidden rounded-xl border border-[#e4e8ef] sm:grid-cols-4">
 
-                            <div
-                              className="
-                                flex
-                                flex-wrap
-                                gap-x-6
-                                gap-y-2
-                              "
-                            >
+                            <div className="flex items-center gap-3 border-b border-[#e4e8ef] p-4 sm:border-b-0 sm:border-r">
 
-                              <div
-                                className="
-                                  flex
-                                  items-center
-                                  gap-2
-                                  font-mono
-                                  text-[7px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  text-[#4f5452]
-                                "
-                              >
-                                <ShieldCheck className="size-3" />
+                              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f7f9fc]">
+                                <Cpu className="size-4 text-[#667085]" />
+                              </div>
+
+                              <div>
+
+                                <div className="text-[10px] font-medium uppercase tracking-wide text-[#98a2b3]">
+                                  vCPU
+                                </div>
+
+                                <div className="mt-1 text-sm font-semibold text-[#344054]">
+                                  {machine.vcpus}
+                                </div>
+
+                              </div>
+
+                            </div>
+
+
+                            <div className="flex items-center gap-3 border-b border-[#e4e8ef] p-4 sm:border-b-0 sm:border-r">
+
+                              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f7f9fc]">
+                                <MemoryStick className="size-4 text-[#667085]" />
+                              </div>
+
+                              <div>
+
+                                <div className="text-[10px] font-medium uppercase tracking-wide text-[#98a2b3]">
+                                  Memory
+                                </div>
+
+                                <div className="mt-1 text-sm font-semibold text-[#344054]">
+                                  {machine.memory_mb / 1024} GiB
+                                </div>
+
+                              </div>
+
+                            </div>
+
+
+                            <div className="flex items-center gap-3 border-b border-[#e4e8ef] p-4 sm:border-b-0 sm:border-r">
+
+                              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f7f9fc]">
+                                <HardDrive className="size-4 text-[#667085]" />
+                              </div>
+
+                              <div>
+
+                                <div className="text-[10px] font-medium uppercase tracking-wide text-[#98a2b3]">
+                                  Disk
+                                </div>
+
+                                <div className="mt-1 text-sm font-semibold text-[#344054]">
+                                  {machine.disk_gb} GiB
+                                </div>
+
+                              </div>
+
+                            </div>
+
+
+                            <div className="flex items-center gap-3 p-4">
+
+                              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f7f9fc]">
+                                <Power className="size-4 text-[#667085]" />
+                              </div>
+
+                              <div>
+
+                                <div className="text-[10px] font-medium uppercase tracking-wide text-[#98a2b3]">
+                                  Power
+                                </div>
+
+                                <div className="mt-1 flex items-center gap-2 text-sm font-semibold capitalize text-[#344054]">
+
+                                  <span
+                                    className={`
+                                      size-1.5
+                                      rounded-full
+                                      ${
+                                        machine.state ===
+                                        "running"
+                                          ? "bg-[#16a34a]"
+                                          : "bg-[#98a2b3]"
+                                      }
+                                    `}
+                                  />
+
+                                  {machine.state}
+
+                                </div>
+
+                              </div>
+
+                            </div>
+
+                          </div>
+
+
+                          {/* OWNER / LEASE */}
+
+                          <div className="mt-5 flex flex-col gap-4 rounded-lg bg-[#f8fafc] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+
+                            <div className="flex flex-wrap gap-x-5 gap-y-2">
+
+                              <div className="flex items-center gap-2 text-xs text-[#667085]">
+
+                                <ShieldCheck className="size-3.5 text-[#98a2b3]" />
 
                                 {machine.owner
                                   ? `Owner: ${machine.owner}`
                                   : "No owner"
                                 }
+
                               </div>
 
 
                               {machine.claimed_at && (
-                                <div
-                                  className="
-                                    flex
-                                    items-center
-                                    gap-2
-                                    font-mono
-                                    text-[7px]
-                                    uppercase
-                                    tracking-[0.1em]
-                                    text-[#4f5452]
-                                  "
-                                >
-                                  <Activity className="size-3" />
+
+                                <div className="flex items-center gap-2 text-xs text-[#667085]">
+
+                                  <Activity className="size-3.5 text-[#98a2b3]" />
 
                                   Claimed{" "}
-                                  {
-                                    formatDate(
-                                      machine.claimed_at
-                                    )
-                                  }
+                                  {formatDate(
+                                    machine.claimed_at
+                                  )}
+
                                 </div>
+
                               )}
 
 
                               {remaining && (
-                                <div
-                                  className="
-                                    flex
-                                    items-center
-                                    gap-2
-                                    font-mono
-                                    text-[7px]
-                                    uppercase
-                                    tracking-[0.1em]
-                                    text-[#4f5452]
-                                  "
-                                >
-                                  <Timer className="size-3" />
+
+                                <div className="flex items-center gap-2 text-xs text-[#667085]">
+
+                                  <Timer className="size-3.5 text-[#98a2b3]" />
+
                                   {remaining}
+
                                 </div>
+
                               )}
 
                             </div>
 
 
-                            <div
-                              className="
-                                font-mono
-                                text-[7px]
-                                uppercase
-                                tracking-[0.1em]
-                                text-[#3f4441]
-                              "
-                            >
-                              {
-                                lifecycleDescription(
-                                  machine.lifecycle_state
-                                )
-                              }
+                            <div className="text-xs text-[#98a2b3]">
+
+                              {lifecycleDescription(
+                                machine.lifecycle_state
+                              )}
+
                             </div>
 
                           </div>
@@ -1485,19 +1194,12 @@ export default function MachinesPage() {
 
                           {/* ACTIONS */}
 
-                          <div
-                            className="
-                              mt-5
-                              flex
-                              flex-wrap
-                              gap-2
-                            "
-                          >
+                          <div className="mt-5 flex flex-wrap gap-2">
 
                             {/* CLAIM */}
 
-                            {machine.lifecycle_state ===
-                              "AVAILABLE" && (
+                            {isAvailable && (
+
                               <Button
                                 disabled={busy}
                                 onClick={() =>
@@ -1508,44 +1210,36 @@ export default function MachinesPage() {
                                 }
                                 className="
                                   h-9
-                                  rounded-none
-                                  bg-[#b7ff4a]
+                                  rounded-lg
+                                  bg-[#2563eb]
                                   px-4
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  text-[#0a0c0b]
-                                  hover:bg-[#c7ff70]
+                                  text-xs
+                                  font-semibold
+                                  text-white
+                                  shadow-sm
+                                  transition
+                                  hover:bg-[#1d4ed8]
+                                  disabled:opacity-60
                                 "
                               >
 
                                 {busy ? (
-                                  <Loader2
-                                    className="
-                                      mr-2
-                                      size-3
-                                      animate-spin
-                                    "
-                                  />
+                                  <Loader2 className="mr-2 size-3.5 animate-spin" />
                                 ) : (
-                                  <Check
-                                    className="
-                                      mr-2
-                                      size-3
-                                    "
-                                  />
+                                  <Check className="mr-2 size-3.5" />
                                 )}
 
                                 Claim machine
 
                               </Button>
+
                             )}
 
 
                             {/* CONNECT */}
 
                             {canConnect && (
+
                               <Button
                                 disabled={
                                   busy ||
@@ -1558,47 +1252,39 @@ export default function MachinesPage() {
                                 }
                                 className="
                                   h-9
-                                  rounded-none
-                                  bg-[#b7ff4a]
+                                  rounded-lg
+                                  bg-[#2563eb]
                                   px-4
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  text-[#0a0c0b]
-                                  hover:bg-[#c7ff70]
+                                  text-xs
+                                  font-semibold
+                                  text-white
+                                  shadow-sm
+                                  transition
+                                  hover:bg-[#1d4ed8]
+                                  disabled:opacity-60
                                 "
                               >
 
                                 {connecting ? (
-                                  <Loader2
-                                    className="
-                                      mr-2
-                                      size-3
-                                      animate-spin
-                                    "
-                                  />
+                                  <Loader2 className="mr-2 size-3.5 animate-spin" />
                                 ) : (
-                                  <Monitor
-                                    className="
-                                      mr-2
-                                      size-3
-                                    "
-                                  />
+                                  <Monitor className="mr-2 size-3.5" />
                                 )}
 
                                 {connecting
-                                  ? "Connecting"
-                                  : "Connect"
+                                  ? "Connecting..."
+                                  : "Open console"
                                 }
 
                               </Button>
+
                             )}
 
 
                             {/* RELEASE */}
 
                             {isOwner && (
+
                               <Button
                                 variant="outline"
                                 disabled={busy}
@@ -1610,39 +1296,28 @@ export default function MachinesPage() {
                                 }
                                 className="
                                   h-9
-                                  rounded-none
-                                  border-[#353a37]
-                                  bg-[#0b0d0d]
+                                  rounded-lg
+                                  border-[#d0d5dd]
+                                  bg-white
                                   px-4
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  hover:bg-[#151717]
-                                  hover:text-[#e8e8e3]
+                                  text-xs
+                                  font-medium
+                                  text-[#344054]
+                                  shadow-sm
+                                  hover:bg-[#f7f9fc]
                                 "
                               >
 
                                 {busy ? (
-                                  <Loader2
-                                    className="
-                                      mr-2
-                                      size-3
-                                      animate-spin
-                                    "
-                                  />
+                                  <Loader2 className="mr-2 size-3.5 animate-spin" />
                                 ) : (
-                                  <Unlock
-                                    className="
-                                      mr-2
-                                      size-3
-                                    "
-                                  />
+                                  <Unlock className="mr-2 size-3.5" />
                                 )}
 
                                 Release
 
                               </Button>
+
                             )}
 
 
@@ -1653,6 +1328,7 @@ export default function MachinesPage() {
                                 "IN_USE" &&
                               machine.state ===
                                 "stopped" && (
+
                                 <Button
                                   variant="outline"
                                   disabled={busy}
@@ -1664,26 +1340,24 @@ export default function MachinesPage() {
                                   }
                                   className="
                                     h-9
-                                    rounded-none
-                                    border-[#353a37]
-                                    bg-[#0b0d0d]
+                                    rounded-lg
+                                    border-[#d0d5dd]
+                                    bg-white
                                     px-4
-                                    font-mono
-                                    text-[8px]
-                                    uppercase
-                                    tracking-[0.1em]
-                                    hover:bg-[#151717]
-                                    hover:text-[#e8e8e3]
+                                    text-xs
+                                    font-medium
+                                    text-[#344054]
+                                    shadow-sm
+                                    hover:bg-[#f7f9fc]
                                   "
                                 >
-                                  <Power
-                                    className="
-                                      mr-2
-                                      size-3
-                                    "
-                                  />
+
+                                  <Power className="mr-2 size-3.5" />
+
                                   Start
+
                                 </Button>
+
                               )}
 
 
@@ -1694,6 +1368,7 @@ export default function MachinesPage() {
                                 "IN_USE" &&
                               machine.state ===
                                 "running" && (
+
                                 <Button
                                   variant="outline"
                                   disabled={busy}
@@ -1705,26 +1380,24 @@ export default function MachinesPage() {
                                   }
                                   className="
                                     h-9
-                                    rounded-none
-                                    border-[#353a37]
-                                    bg-[#0b0d0d]
+                                    rounded-lg
+                                    border-[#d0d5dd]
+                                    bg-white
                                     px-4
-                                    font-mono
-                                    text-[8px]
-                                    uppercase
-                                    tracking-[0.1em]
-                                    hover:bg-[#151717]
-                                    hover:text-[#e8e8e3]
+                                    text-xs
+                                    font-medium
+                                    text-[#344054]
+                                    shadow-sm
+                                    hover:bg-[#f7f9fc]
                                   "
                                 >
-                                  <Power
-                                    className="
-                                      mr-2
-                                      size-3
-                                    "
-                                  />
+
+                                  <Power className="mr-2 size-3.5" />
+
                                   Stop
+
                                 </Button>
+
                               )}
 
 
@@ -1735,6 +1408,7 @@ export default function MachinesPage() {
                                 "IN_USE" &&
                               machine.state ===
                                 "running" && (
+
                                 <Button
                                   variant="outline"
                                   disabled={busy}
@@ -1746,71 +1420,51 @@ export default function MachinesPage() {
                                   }
                                   className="
                                     h-9
-                                    rounded-none
-                                    border-[#353a37]
-                                    bg-[#0b0d0d]
+                                    rounded-lg
+                                    border-[#d0d5dd]
+                                    bg-white
                                     px-4
-                                    font-mono
-                                    text-[8px]
-                                    uppercase
-                                    tracking-[0.1em]
-                                    hover:bg-[#151717]
-                                    hover:text-[#e8e8e3]
+                                    text-xs
+                                    font-medium
+                                    text-[#344054]
+                                    shadow-sm
+                                    hover:bg-[#f7f9fc]
                                   "
                                 >
-                                  <RotateCcw
-                                    className="
-                                      mr-2
-                                      size-3
-                                    "
-                                  />
+
+                                  <RotateCcw className="mr-2 size-3.5" />
+
                                   Reboot
+
                                 </Button>
+
                               )}
 
                           </div>
 
                         </article>
+
                       )
                     }
                   )}
 
                 </div>
+
               )}
 
 
             {/* FOOTER */}
 
-            <div
-              className="
-                flex
-                flex-col
-                gap-2
-                border-t
-                border-[#292c2c]
-                px-5
-                py-3
-                font-mono
-                text-[7px]
-                uppercase
-                tracking-[0.12em]
-                text-[#3f4441]
-                sm:flex-row
-                sm:items-center
-                sm:justify-between
-              "
-            >
+            <div className="flex flex-col gap-1 border-t border-[#eef1f5] px-5 py-4 text-xs text-[#98a2b3] sm:flex-row sm:items-center sm:justify-between">
 
               <span>
-                JCLOUD / MACHINE CONTROL
+                JCloud compute
               </span>
 
               <span>
-                {
-                  resettingCount > 0
-                    ? `${resettingCount} RESETTING`
-                    : `${inUseCount} IN USE`
-                }
+                {resettingCount > 0
+                  ? `${resettingCount} machine${resettingCount === 1 ? "" : "s"} resetting`
+                  : `${inUseCount} machine${inUseCount === 1 ? "" : "s"} in use`}
               </span>
 
             </div>

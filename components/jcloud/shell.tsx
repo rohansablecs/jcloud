@@ -13,7 +13,7 @@ export function JCloudShell({
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#090a0a] text-[#e8e8e3]">
+    <div className="min-h-screen bg-[#f6f8fc] text-[#172033]">
 
       <Sidebar
         collapsed={collapsed}
@@ -22,6 +22,7 @@ export function JCloudShell({
 
       <div
         className={`
+          min-h-screen
           transition-[padding]
           duration-300
           ease-out
@@ -35,9 +36,9 @@ export function JCloudShell({
 
         <Header />
 
-        <main className="px-6 py-8 lg:px-10 lg:py-12">
+        <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 
-          <div className="mx-auto max-w-[1500px]">
+          <div className="mx-auto w-full max-w-[1500px]">
 
             {children}
 

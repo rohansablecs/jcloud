@@ -325,7 +325,7 @@ function PreviewContent({
 
   if (isImage) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center p-8">
+      <div className="flex min-h-[500px] items-center justify-center bg-[#f8fafc] p-8">
         <img
           src={url}
           alt={item.name}
@@ -347,7 +347,7 @@ function PreviewContent({
 
   if (isVideo) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center p-8">
+      <div className="flex min-h-[500px] items-center justify-center bg-[#f8fafc] p-8">
         <video
           src={url}
           controls
@@ -359,13 +359,18 @@ function PreviewContent({
 
   if (isAudio) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center p-8">
-        <div className="w-full max-w-lg border border-[#292c2c] bg-[#0d0f0f] p-8">
-          <div className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f5452]">
-            Audio object
+      <div className="flex min-h-[500px] items-center justify-center bg-[#f8fafc] p-8">
+        <div className="w-full max-w-lg rounded-xl border border-[#e4e8ef] bg-white p-8 shadow-sm">
+
+          <div className="flex size-12 items-center justify-center rounded-xl bg-[#eff6ff]">
+            <FileAudio className="size-5 text-[#2563eb]" />
           </div>
 
-          <div className="mt-3 truncate font-mono text-sm text-[#e8e8e3]">
+          <div className="mt-5 text-xs font-medium text-[#667085]">
+            Audio file
+          </div>
+
+          <div className="mt-1 truncate text-lg font-semibold text-[#172033]">
             {item.name}
           </div>
 
@@ -374,31 +379,34 @@ function PreviewContent({
             controls
             className="mt-8 w-full"
           />
+
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-[500px] items-center justify-center p-8">
+    <div className="flex min-h-[500px] items-center justify-center bg-[#f8fafc] p-8">
       <div className="max-w-md text-center">
-        <div className="mx-auto flex size-16 items-center justify-center border border-[#292c2c]">
-          <File className="size-6 text-[#4f5452]" />
+
+        <div className="mx-auto flex size-16 items-center justify-center rounded-xl border border-[#e4e8ef] bg-white">
+          <File className="size-6 text-[#98a2b3]" />
         </div>
 
-        <div className="mt-6 font-mono text-[9px] uppercase tracking-[0.14em] text-[#e8e8e3]">
+        <div className="mt-6 text-sm font-semibold text-[#172033]">
           Preview unavailable
         </div>
 
-        <p className="mt-3 font-mono text-[8px] leading-5 text-[#4f5452]">
-          JCloud cannot render this file
-          type directly in the browser.
+        <p className="mt-2 text-xs leading-5 text-[#667085]">
+          JCloud cannot render this file type
+          directly in the browser.
         </p>
 
-        <p className="mt-3 font-mono text-[8px] text-[#3f4441]">
+        <p className="mt-3 font-mono text-[10px] text-[#98a2b3]">
           {item.content_type ||
             extension.toUpperCase()}
         </p>
+
       </div>
     </div>
   )
@@ -1129,41 +1137,34 @@ export default function StoragePage() {
 
   return (
     <JCloudShell>
-      <div className="relative space-y-8">
-
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-0
-            -z-10
-            opacity-[0.07]
-            [background-image:linear-gradient(to_right,#292c2c_1px,transparent_1px),linear-gradient(to_bottom,#292c2c_1px,transparent_1px)]
-            [background-size:48px_48px]
-          "
-        />
+      <div className="mx-auto w-full max-w-[1500px] space-y-7">
 
         {/* HEADER */}
 
-        <section className="flex flex-col justify-between gap-6 border-b border-[#292c2c] pb-8 lg:flex-row lg:items-end">
+        <section className="flex flex-col justify-between gap-5 border-b border-[#e4e8ef] pb-7 lg:flex-row lg:items-end">
 
           <div>
 
-            <div className="flex items-center gap-3 font-mono text-[8px] uppercase tracking-[0.18em] text-[#4f5452]">
-              <span className="size-1.5 bg-[#b7ff4a]" />
-              Filesystem / Nextcloud
+            <div className="flex items-center gap-2 text-xs font-medium text-[#667085]">
+
+              <div className="flex size-7 items-center justify-center rounded-lg bg-[#eff6ff]">
+                <HardDrive className="size-3.5 text-[#2563eb]" />
+              </div>
+
+              Cloud storage
+
             </div>
 
-            <h2 className="mt-4 text-5xl font-medium tracking-[-0.045em]">
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-[#172033] sm:text-4xl">
               Storage
-            </h2>
+            </h1>
 
-            <p className="mt-3 max-w-lg font-mono text-[9px] leading-5 text-[#4f5452]">
-              Private cloud storage managed
-              through the JCloud control plane.
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#667085]">
+              Manage your private files and folders through JCloud.
             </p>
 
           </div>
+
 
           <div className="flex flex-wrap gap-2">
 
@@ -1174,21 +1175,21 @@ export default function StoragePage() {
               }
               className="
                 h-10
-                rounded-none
-                border-[#353a37]
-                bg-[#0b0d0d]
+                rounded-lg
+                border-[#d0d5dd]
+                bg-white
                 px-4
-                font-mono
-                text-[9px]
-                uppercase
-                tracking-[0.1em]
-                hover:bg-[#151717]
-                hover:text-[#e8e8e3]
+                text-sm
+                font-medium
+                text-[#344054]
+                shadow-sm
+                hover:bg-[#f7f9fc]
               "
             >
-              <FolderPlus className="mr-2 size-3.5" />
+              <FolderPlus className="mr-2 size-4" />
               New folder
             </Button>
+
 
             <Button
               variant="outline"
@@ -1200,27 +1201,25 @@ export default function StoragePage() {
               disabled={refreshing}
               className="
                 h-10
-                rounded-none
-                border-[#353a37]
-                bg-[#0b0d0d]
+                rounded-lg
+                border-[#d0d5dd]
+                bg-white
                 px-3
-                font-mono
-                text-[9px]
-                uppercase
-                tracking-[0.1em]
-                hover:bg-[#151717]
-                hover:text-[#e8e8e3]
+                text-[#344054]
+                shadow-sm
+                hover:bg-[#f7f9fc]
               "
               title="Refresh"
             >
               <RefreshCw
-                className={`size-3.5 ${
+                className={`size-4 ${
                   refreshing
                     ? "animate-spin"
                     : ""
                 }`}
               />
             </Button>
+
 
             <label className="cursor-pointer">
 
@@ -1230,21 +1229,18 @@ export default function StoragePage() {
                   h-10
                   items-center
                   justify-center
-                  border
-                  border-[#b7ff4a]
-                  bg-[#b7ff4a]
+                  rounded-lg
+                  bg-[#2563eb]
                   px-4
-                  font-mono
-                  text-[9px]
+                  text-sm
                   font-medium
-                  uppercase
-                  tracking-[0.1em]
-                  text-[#080908]
-                  transition-colors
-                  hover:bg-[#c7ff75]
+                  text-white
+                  shadow-sm
+                  transition
+                  hover:bg-[#1d4ed8]
                 "
               >
-                <Upload className="mr-2 size-3.5" />
+                <Upload className="mr-2 size-4" />
                 Upload
               </span>
 
@@ -1262,54 +1258,78 @@ export default function StoragePage() {
 
         </section>
 
-        {/* SYSTEM STRIP */}
 
-        <div className="grid grid-cols-2 border-y border-[#292c2c] sm:grid-cols-4">
+        {/* STORAGE OVERVIEW */}
 
-          <div className="border-r border-[#292c2c] px-5 py-4">
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
-              Filesystem
+        <section className="grid gap-4 sm:grid-cols-3">
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="flex items-center justify-between">
+
+              <div className="text-xs font-medium text-[#667085]">
+                Storage provider
+              </div>
+
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[#eff6ff]">
+                <HardDrive className="size-4 text-[#2563eb]" />
+              </div>
+
             </div>
 
-            <div className="mt-2 flex items-center gap-2 font-mono text-[9px] uppercase">
-              <span className="size-1.5 bg-[#b7ff4a]" />
-              Online
-            </div>
-          </div>
-
-          <div className="border-r border-[#292c2c] px-5 py-4">
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
-              Provider
-            </div>
-
-            <div className="mt-2 font-mono text-[9px] uppercase">
+            <div className="mt-4 text-lg font-semibold text-[#172033]">
               Nextcloud
             </div>
+
+            <div className="mt-1 text-xs text-[#98a2b3]">
+              Private cloud filesystem
+            </div>
+
           </div>
 
-          <div className="border-r border-[#292c2c] px-5 py-4">
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
-              Objects
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="text-xs font-medium text-[#667085]">
+              Current directory
             </div>
 
-            <div className="mt-2 font-mono text-[9px]">
-              {items.length
-                .toString()
-                .padStart(2, "0")}
-            </div>
-          </div>
-
-          <div className="px-5 py-4">
-            <div className="font-mono text-[7px] uppercase tracking-[0.16em] text-[#4f5452]">
-              Location
-            </div>
-
-            <div className="mt-2 truncate font-mono text-[9px]">
+            <div className="mt-4 truncate font-mono text-lg font-medium text-[#172033]">
               {path || "/"}
             </div>
+
+            <div className="mt-1 text-xs text-[#98a2b3]">
+              {items.length} visible object
+              {items.length === 1
+                ? ""
+                : "s"}
+            </div>
+
           </div>
 
-        </div>
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="text-xs font-medium text-[#667085]">
+              Connection
+            </div>
+
+            <div className="mt-4 flex items-center gap-2 text-lg font-semibold text-[#172033]">
+
+              <span className="size-2 rounded-full bg-[#16a34a]" />
+
+              Online
+
+            </div>
+
+            <div className="mt-1 text-xs text-[#98a2b3]">
+              Filesystem available
+            </div>
+
+          </div>
+
+        </section>
+
 
         {/* DROP ZONE */}
 
@@ -1332,7 +1352,7 @@ export default function StoragePage() {
           }}
           onDrop={handleDrop}
           className={`
-            relative
+            rounded-xl
             border
             border-dashed
             px-6
@@ -1340,47 +1360,64 @@ export default function StoragePage() {
             transition-colors
             ${
               dragging
-                ? "border-[#b7ff4a] bg-[#b7ff4a]/[0.04]"
-                : "border-[#292c2c] bg-[#090a0a]"
+                ? "border-[#2563eb] bg-[#eff6ff]"
+                : "border-[#d0d5dd] bg-white"
             }
           `}
         >
+
           <div className="flex items-center justify-center gap-3">
 
-            <Upload
-              className={`size-4 ${
-                dragging
-                  ? "text-[#b7ff4a]"
-                  : "text-[#4f5452]"
-              }`}
-            />
+            <div className="flex size-9 items-center justify-center rounded-lg bg-[#f7f9fc]">
 
-            <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f5452]">
-              {dragging
-                ? "Release to upload"
-                : "Drop files here to upload"}
-            </span>
+              <Upload
+                className={`size-4 ${
+                  dragging
+                    ? "text-[#2563eb]"
+                    : "text-[#667085]"
+                }`}
+              />
+
+            </div>
+
+            <div>
+
+              <div className="text-sm font-medium text-[#344054]">
+                {dragging
+                  ? "Release to upload"
+                  : "Drop files here to upload"}
+              </div>
+
+              <div className="mt-0.5 text-xs text-[#98a2b3]">
+                Upload directly to the current directory
+              </div>
+
+            </div>
 
           </div>
+
         </div>
+
 
         {/* UPLOAD QUEUE */}
 
         {uploads.length > 0 && (
-          <section className="border border-[#292c2c] bg-[#090a0a]">
+          <section className="overflow-hidden rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
 
-            <div className="flex items-center justify-between border-b border-[#292c2c] bg-[#0d0f0f] px-5 py-4">
+            <div className="flex items-center justify-between border-b border-[#eef1f5] px-5 py-4">
 
               <div>
-                <div className="font-mono text-[8px] uppercase tracking-[0.14em] text-[#e8e8e3]">
+
+                <div className="text-sm font-semibold text-[#172033]">
                   Upload queue
                 </div>
 
-                <div className="mt-1 font-mono text-[7px] uppercase tracking-[0.12em] text-[#4f5452]">
+                <div className="mt-1 text-xs text-[#98a2b3]">
                   {activeUploads.length
                     ? `${activeUploads.length} active`
                     : `${completedUploads.length} complete`}
                 </div>
+
               </div>
 
               {completedUploads.length >
@@ -1390,7 +1427,7 @@ export default function StoragePage() {
                   onClick={
                     clearCompletedUploads
                   }
-                  className="font-mono text-[7px] uppercase tracking-[0.1em] text-[#4f5452] hover:text-[#e8e8e3]"
+                  className="text-xs font-medium text-[#667085] hover:text-[#2563eb]"
                 >
                   Clear complete
                 </button>
@@ -1398,7 +1435,8 @@ export default function StoragePage() {
 
             </div>
 
-            <div className="divide-y divide-[#202323]">
+
+            <div className="divide-y divide-[#eef1f5]">
 
               {uploads.map(
                 (upload) => (
@@ -1407,15 +1445,17 @@ export default function StoragePage() {
                     className="flex items-center gap-4 px-5 py-3"
                   >
 
-                    <File className="size-3.5 shrink-0 text-[#4f5452]" />
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f7f9fc]">
+                      <File className="size-3.5 text-[#667085]" />
+                    </div>
 
                     <div className="min-w-0 flex-1">
 
-                      <div className="truncate font-mono text-[9px] text-[#cfd3d0]">
+                      <div className="truncate text-sm font-medium text-[#344054]">
                         {upload.file.name}
                       </div>
 
-                      <div className="mt-1 font-mono text-[7px] uppercase tracking-[0.1em] text-[#3f4441]">
+                      <div className="mt-0.5 text-xs text-[#98a2b3]">
                         {formatBytes(
                           upload.file.size
                         )}
@@ -1428,9 +1468,9 @@ export default function StoragePage() {
                       {upload.status ===
                         "uploading" && (
                         <>
-                          <Loader2 className="size-3 animate-spin text-[#b7ff4a]" />
+                          <Loader2 className="size-3.5 animate-spin text-[#2563eb]" />
 
-                          <span className="font-mono text-[7px] uppercase text-[#b7ff4a]">
+                          <span className="text-xs font-medium text-[#2563eb]">
                             Uploading
                           </span>
                         </>
@@ -1438,21 +1478,21 @@ export default function StoragePage() {
 
                       {upload.status ===
                         "queued" && (
-                        <span className="font-mono text-[7px] uppercase text-[#4f5452]">
+                        <span className="text-xs text-[#667085]">
                           Queued
                         </span>
                       )}
 
                       {upload.status ===
                         "done" && (
-                        <span className="font-mono text-[7px] uppercase text-[#b7ff4a]">
+                        <span className="rounded-full bg-[#ecfdf3] px-2 py-1 text-[10px] font-medium text-[#15803d]">
                           Complete
                         </span>
                       )}
 
                       {upload.status ===
                         "error" && (
-                        <span className="font-mono text-[7px] uppercase text-red-400">
+                        <span className="rounded-full bg-[#fef2f2] px-2 py-1 text-[10px] font-medium text-[#b42318]">
                           Failed
                         </span>
                       )}
@@ -1466,9 +1506,9 @@ export default function StoragePage() {
                               upload.id
                             )
                           }
-                          className="text-[#4f5452] hover:text-[#e8e8e3]"
+                          className="flex size-7 items-center justify-center rounded-md text-[#98a2b3] hover:bg-[#f7f9fc] hover:text-[#344054]"
                         >
-                          <X className="size-3" />
+                          <X className="size-3.5" />
                         </button>
                       )}
 
@@ -1483,22 +1523,17 @@ export default function StoragePage() {
           </section>
         )}
 
-        {/* TOOLBAR */}
 
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        {/* BROWSER TOOLBAR */}
 
-          <div className="flex min-w-0 items-center gap-2 overflow-x-auto">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
-            <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.15em] text-[#4f5452]">
-              Path
-            </span>
-
-            <span className="h-3 w-px shrink-0 bg-[#292c2c]" />
+          <div className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-lg border border-[#e4e8ef] bg-white px-3 py-2 shadow-[0_2px_8px_rgba(16,24,40,0.02)]">
 
             <button
               type="button"
               onClick={goHome}
-              className="shrink-0 font-mono text-[10px] uppercase tracking-[0.06em] text-[#a5aaa7] hover:text-[#b7ff4a]"
+              className="shrink-0 rounded-md px-2 py-1 text-xs font-medium text-[#667085] hover:bg-[#f7f9fc] hover:text-[#2563eb]"
             >
               Home
             </button>
@@ -1507,10 +1542,10 @@ export default function StoragePage() {
               (crumb, index) => (
                 <div
                   key={`${crumb}-${index}`}
-                  className="flex shrink-0 items-center gap-2"
+                  className="flex shrink-0 items-center"
                 >
 
-                  <ChevronRight className="size-3 text-[#353a37]" />
+                  <ChevronRight className="mx-1 size-3 text-[#d0d5dd]" />
 
                   <button
                     type="button"
@@ -1522,16 +1557,17 @@ export default function StoragePage() {
                     className={`
                       max-w-40
                       truncate
-                      font-mono
-                      text-[10px]
-                      uppercase
-                      tracking-[0.06em]
+                      rounded-md
+                      px-2
+                      py-1
+                      text-xs
+                      font-medium
                       transition-colors
                       ${
                         index ===
                         breadcrumbs.length - 1
-                          ? "text-[#e8e8e3]"
-                          : "text-[#737875] hover:text-[#e8e8e3]"
+                          ? "text-[#172033]"
+                          : "text-[#667085] hover:bg-[#f7f9fc] hover:text-[#2563eb]"
                       }
                     `}
                   >
@@ -1544,25 +1580,27 @@ export default function StoragePage() {
 
           </div>
 
+
           <div className="relative w-full lg:w-80">
 
-            <Search className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[#4f5452]" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#98a2b3]" />
 
             <Input
               className="
                 h-10
-                rounded-none
-                border-[#292c2c]
-                bg-[#0b0d0d]
+                rounded-lg
+                border-[#d0d5dd]
+                bg-white
                 pl-9
-                font-mono
-                text-[10px]
-                text-[#e8e8e3]
-                placeholder:text-[#3f4441]
-                focus-visible:border-[#b7ff4a]
-                focus-visible:ring-0
+                text-sm
+                text-[#172033]
+                shadow-sm
+                placeholder:text-[#98a2b3]
+                focus-visible:border-[#2563eb]
+                focus-visible:ring-4
+                focus-visible:ring-[#2563eb]/10
               "
-              placeholder="SEARCH DIRECTORY"
+              placeholder="Search files..."
               value={search}
               onChange={(event) =>
                 setSearch(
@@ -1575,20 +1613,26 @@ export default function StoragePage() {
 
         </div>
 
+
         {/* ERROR */}
 
         {error && (
-          <div className="flex items-start justify-between gap-4 border border-red-900/40 bg-red-950/10 p-4">
+          <div className="flex items-start justify-between gap-4 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-4">
 
             <div>
-              <div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.1em] text-red-400">
-                <span className="size-1.5 bg-red-400" />
+
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#b42318]">
+
+                <span className="size-2 rounded-full bg-[#dc2626]" />
+
                 Filesystem error
+
               </div>
 
-              <p className="mt-2 font-mono text-[9px] leading-5 text-red-300/70">
+              <p className="mt-1.5 text-xs leading-5 text-[#b42318]/80">
                 {error}
               </p>
+
             </div>
 
             <button
@@ -1596,7 +1640,7 @@ export default function StoragePage() {
               onClick={() =>
                 setError("")
               }
-              className="text-red-400/60 hover:text-red-400"
+              className="flex size-7 items-center justify-center rounded-md text-[#b42318]/60 hover:bg-white hover:text-[#b42318]"
             >
               <X className="size-3.5" />
             </button>
@@ -1604,18 +1648,21 @@ export default function StoragePage() {
           </div>
         )}
 
+
         {/* FILE LIST */}
 
-        <div className="overflow-visible border border-[#292c2c] bg-[#090a0a]">
+        <div className="overflow-visible rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
 
-          <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-[#292c2c] bg-[#0d0f0f] px-5 py-4">
+          {/* TABLE HEADER */}
+
+          <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-[#eef1f5] bg-[#f8fafc] px-5 py-3.5">
 
             <button
               type="button"
               onClick={() =>
                 changeSort("name")
               }
-              className="flex items-center gap-2 text-left font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f5452] hover:text-[#e8e8e3]"
+              className="flex items-center gap-2 text-left text-xs font-semibold text-[#667085] hover:text-[#344054]"
             >
               Name
 
@@ -1629,12 +1676,13 @@ export default function StoragePage() {
                 )}
             </button>
 
+
             <button
               type="button"
               onClick={() =>
                 changeSort("modified")
               }
-              className="hidden items-center gap-2 font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f5452] hover:text-[#e8e8e3] sm:flex"
+              className="hidden items-center gap-2 text-xs font-semibold text-[#667085] hover:text-[#344054] sm:flex"
             >
               Modified
 
@@ -1648,12 +1696,13 @@ export default function StoragePage() {
                 )}
             </button>
 
+
             <button
               type="button"
               onClick={() =>
                 changeSort("size")
               }
-              className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f5452] hover:text-[#e8e8e3]"
+              className="flex items-center gap-2 text-xs font-semibold text-[#667085] hover:text-[#344054]"
             >
               Size
 
@@ -1669,14 +1718,25 @@ export default function StoragePage() {
 
           </div>
 
+
+          {/* LOADING */}
+
           {loading ? (
 
             <div className="flex min-h-[420px] flex-col items-center justify-center">
 
-              <Loader2 className="size-5 animate-spin text-[#b7ff4a]" />
+              <div className="flex size-11 items-center justify-center rounded-xl bg-[#eff6ff]">
 
-              <div className="mt-4 font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f5452]">
+                <Loader2 className="size-5 animate-spin text-[#2563eb]" />
+
+              </div>
+
+              <div className="mt-4 text-sm font-medium text-[#344054]">
                 Reading filesystem
+              </div>
+
+              <div className="mt-1 text-xs text-[#98a2b3]">
+                Loading your files and folders
               </div>
 
             </div>
@@ -1688,25 +1748,64 @@ export default function StoragePage() {
 
               <div className="text-center">
 
-                <div className="mx-auto flex size-14 items-center justify-center border border-[#292c2c]">
+                <div className="mx-auto flex size-14 items-center justify-center rounded-xl bg-[#eff6ff]">
+
                   {search ? (
-                    <Search className="size-5 text-[#4f5452]" />
+                    <Search className="size-5 text-[#2563eb]" />
                   ) : (
-                    <HardDrive className="size-5 text-[#4f5452]" />
+                    <Folder className="size-5 text-[#2563eb]" />
                   )}
+
                 </div>
 
-                <div className="mt-6 font-mono text-[9px] uppercase tracking-[0.14em] text-[#e8e8e3]">
+                <div className="mt-5 text-sm font-semibold text-[#172033]">
+
                   {search
-                    ? "No matching objects"
-                    : "Filesystem empty"}
+                    ? "No matching files"
+                    : "This folder is empty"}
+
                 </div>
 
-                <p className="mt-2 max-w-xs font-mono text-[8px] leading-5 text-[#4f5452]">
+                <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-[#667085]">
+
                   {search
-                    ? "No filesystem objects match the current query."
-                    : "Drop files above or create a folder to initialize this directory."}
+                    ? "Try a different search term."
+                    : "Upload files or create a folder to get started."}
+
                 </p>
+
+                {!search && (
+                  <div className="mt-5 flex justify-center gap-2">
+
+                    <Button
+                      variant="outline"
+                      onClick={
+                        openFolderDialog
+                      }
+                      className="h-9 rounded-lg border-[#d0d5dd] bg-white text-xs"
+                    >
+                      <FolderPlus className="mr-2 size-3.5" />
+                      New folder
+                    </Button>
+
+                    <label className="cursor-pointer">
+
+                      <span className="inline-flex h-9 items-center rounded-lg bg-[#2563eb] px-3 text-xs font-medium text-white hover:bg-[#1d4ed8]">
+                        <Upload className="mr-2 size-3.5" />
+                        Upload
+                      </span>
+
+                      <input
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={handleUpload}
+                      />
+
+                    </label>
+
+                  </div>
+                )}
 
               </div>
 
@@ -1718,6 +1817,7 @@ export default function StoragePage() {
 
               {sortedItems.map(
                 (item) => {
+
                   const folder =
                     isFolder(item)
 
@@ -1734,14 +1834,16 @@ export default function StoragePage() {
                         items-center
                         gap-4
                         border-b
-                        border-[#202323]
+                        border-[#eef1f5]
                         px-5
-                        py-4
+                        py-3
                         transition-colors
                         last:border-b-0
-                        hover:bg-[#0d0f0f]
+                        hover:bg-[#f8fafc]
                       "
                     >
+
+                      {/* NAME */}
 
                       <button
                         type="button"
@@ -1750,7 +1852,7 @@ export default function StoragePage() {
                             item
                           )
                         }
-                        className="flex min-w-0 items-center gap-4 text-left"
+                        className="flex min-w-0 items-center gap-3 text-left"
                       >
 
                         <div
@@ -1760,35 +1862,38 @@ export default function StoragePage() {
                             shrink-0
                             items-center
                             justify-center
-                            border
+                            rounded-lg
                             ${
                               folder
-                                ? "border-[#39432f] bg-[#11160d]"
-                                : "border-[#292c2c] bg-[#0d0f0f]"
+                                ? "bg-[#fff8e7]"
+                                : "bg-[#f7f9fc]"
                             }
                           `}
                         >
+
                           <Icon
                             className={`
                               size-4
                               ${
                                 folder
-                                  ? "text-[#b7ff4a]"
-                                  : "text-[#737875]"
+                                  ? "text-[#d99a16]"
+                                  : "text-[#667085]"
                               }
                             `}
                           />
+
                         </div>
+
 
                         <div className="min-w-0">
 
-                          <div className="truncate font-mono text-[10px] text-[#d9dcd9]">
+                          <div className="truncate text-sm font-medium text-[#344054] group-hover:text-[#172033]">
                             {item.name}
                           </div>
 
-                          <div className="mt-1 font-mono text-[7px] uppercase tracking-[0.1em] text-[#3f4441]">
+                          <div className="mt-0.5 truncate text-[11px] text-[#98a2b3]">
                             {folder
-                              ? "Directory"
+                              ? "Folder"
                               : item.content_type ||
                                 "File"}
                           </div>
@@ -1797,21 +1902,28 @@ export default function StoragePage() {
 
                       </button>
 
-                      <span className="hidden whitespace-nowrap font-mono text-[8px] text-[#4f5452] sm:block">
+
+                      {/* MODIFIED */}
+
+                      <span className="hidden whitespace-nowrap text-xs text-[#98a2b3] sm:block">
                         {formatDate(
                           item.modified
                         )}
                       </span>
 
+
+                      {/* ACTIONS */}
+
                       <div className="flex items-center gap-1">
 
-                        <span className="hidden whitespace-nowrap px-2 font-mono text-[8px] uppercase text-[#666c68] sm:block">
+                        <span className="hidden min-w-16 text-right text-xs text-[#667085] sm:block">
                           {folder
-                            ? "Folder"
+                            ? "—"
                             : formatBytes(
                                 item.size
                               )}
                         </span>
+
 
                         {!folder && (
                           <button
@@ -1826,21 +1938,20 @@ export default function StoragePage() {
                               size-8
                               items-center
                               justify-center
-                              border
-                              border-transparent
-                              text-[#4f5452]
+                              rounded-md
+                              text-[#98a2b3]
                               opacity-0
-                              transition-all
-                              hover:border-[#353a37]
-                              hover:text-[#e8e8e3]
+                              transition
+                              hover:bg-[#eff6ff]
+                              hover:text-[#2563eb]
                               group-hover:opacity-100
-                              sm:size-7
                             "
                             title="Download"
                           >
                             <Download className="size-3.5" />
                           </button>
                         )}
+
 
                         <div className="relative">
 
@@ -1859,19 +1970,17 @@ export default function StoragePage() {
                               size-8
                               items-center
                               justify-center
-                              border
-                              border-transparent
-                              text-[#4f5452]
-                              transition-all
-                              hover:border-[#353a37]
-                              hover:bg-[#151717]
-                              hover:text-[#e8e8e3]
-                              sm:size-7
+                              rounded-md
+                              text-[#98a2b3]
+                              transition
+                              hover:bg-[#f2f4f7]
+                              hover:text-[#344054]
                             "
                             title="Actions"
                           >
-                            <MoreHorizontal className="size-3.5" />
+                            <MoreHorizontal className="size-4" />
                           </button>
+
 
                           {menuItem?.path ===
                             item.path && (
@@ -1882,11 +1991,13 @@ export default function StoragePage() {
                                 top-9
                                 z-[80]
                                 w-48
+                                overflow-hidden
+                                rounded-lg
                                 border
-                                border-[#353a37]
-                                bg-[#0b0d0d]
+                                border-[#e4e8ef]
+                                bg-white
                                 py-1
-                                shadow-2xl
+                                shadow-[0_12px_32px_rgba(16,24,40,0.14)]
                               "
                             >
 
@@ -1914,18 +2025,16 @@ export default function StoragePage() {
                                   justify-between
                                   px-4
                                   py-2.5
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  text-[#a5aaa7]
-                                  hover:bg-[#151717]
-                                  hover:text-[#e8e8e3]
+                                  text-xs
+                                  font-medium
+                                  text-[#344054]
+                                  hover:bg-[#f8fafc]
                                 "
                               >
                                 Open
-                                <ChevronRight className="size-3" />
+                                <ChevronRight className="size-3.5 text-[#98a2b3]" />
                               </button>
+
 
                               {!item.is_directory && (
                                 <button
@@ -1943,21 +2052,20 @@ export default function StoragePage() {
                                     justify-between
                                     px-4
                                     py-2.5
-                                    font-mono
-                                    text-[8px]
-                                    uppercase
-                                    tracking-[0.1em]
-                                    text-[#a5aaa7]
-                                    hover:bg-[#151717]
-                                    hover:text-[#e8e8e3]
+                                    text-xs
+                                    font-medium
+                                    text-[#344054]
+                                    hover:bg-[#f8fafc]
                                   "
                                 >
                                   Download
-                                  <Download className="size-3" />
+                                  <Download className="size-3.5 text-[#98a2b3]" />
                                 </button>
                               )}
 
-                              <div className="my-1 border-t border-[#292c2c]" />
+
+                              <div className="my-1 border-t border-[#eef1f5]" />
+
 
                               <button
                                 type="button"
@@ -1973,18 +2081,16 @@ export default function StoragePage() {
                                   justify-between
                                   px-4
                                   py-2.5
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  text-[#a5aaa7]
-                                  hover:bg-[#151717]
-                                  hover:text-[#e8e8e3]
+                                  text-xs
+                                  font-medium
+                                  text-[#344054]
+                                  hover:bg-[#f8fafc]
                                 "
                               >
                                 Rename
-                                <Pencil className="size-3" />
+                                <Pencil className="size-3.5 text-[#98a2b3]" />
                               </button>
+
 
                               <button
                                 type="button"
@@ -2000,20 +2106,19 @@ export default function StoragePage() {
                                   justify-between
                                   px-4
                                   py-2.5
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  text-[#a5aaa7]
-                                  hover:bg-[#151717]
-                                  hover:text-[#e8e8e3]
+                                  text-xs
+                                  font-medium
+                                  text-[#344054]
+                                  hover:bg-[#f8fafc]
                                 "
                               >
                                 Move
-                                <FolderOpen className="size-3" />
+                                <FolderOpen className="size-3.5 text-[#98a2b3]" />
                               </button>
 
-                              <div className="my-1 border-t border-[#292c2c]" />
+
+                              <div className="my-1 border-t border-[#eef1f5]" />
+
 
                               <button
                                 type="button"
@@ -2029,16 +2134,14 @@ export default function StoragePage() {
                                   justify-between
                                   px-4
                                   py-2.5
-                                  font-mono
-                                  text-[8px]
-                                  uppercase
-                                  tracking-[0.1em]
-                                  text-red-400
-                                  hover:bg-red-950/20
+                                  text-xs
+                                  font-medium
+                                  text-[#dc2626]
+                                  hover:bg-[#fef2f2]
                                 "
                               >
                                 Delete
-                                <Trash2 className="size-3" />
+                                <Trash2 className="size-3.5" />
                               </button>
 
                             </div>
@@ -2059,26 +2162,28 @@ export default function StoragePage() {
 
         </div>
 
-        {/* FOOTER */}
 
-        <div className="flex flex-col justify-between gap-2 border-t border-[#292c2c] pt-4 font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441] sm:flex-row">
+        {/* STORAGE FOOTER */}
+
+        <div className="flex flex-col gap-2 border-t border-[#e4e8ef] py-4 text-xs text-[#98a2b3] sm:flex-row sm:items-center sm:justify-between">
 
           <span>
-            JCLOUD / STORAGE CONTROL
+            JCloud · Storage
           </span>
 
           <span>
-            {sortedItems.length} OBJECT
+            {sortedItems.length} object
             {sortedItems.length === 1
               ? ""
-              : "S"} VISIBLE
+              : "s"} visible
           </span>
 
           <span>
-            NODE / NEXTCLOUD
+            Nextcloud filesystem
           </span>
 
         </div>
+
 
         {/* ACTION DIALOG */}
 
@@ -2091,7 +2196,7 @@ export default function StoragePage() {
               flex
               items-center
               justify-center
-              bg-black/75
+              bg-[#101828]/45
               p-4
               backdrop-blur-sm
             "
@@ -2106,20 +2211,20 @@ export default function StoragePage() {
             }}
           >
 
-            <div className="w-full max-w-md border border-[#353a37] bg-[#0b0d0d] shadow-2xl">
+            <div className="w-full max-w-md overflow-hidden rounded-xl border border-[#e4e8ef] bg-white shadow-[0_24px_64px_rgba(16,24,40,0.18)]">
 
-              <div className="flex items-center justify-between border-b border-[#292c2c] px-5 py-4">
+              <div className="flex items-center justify-between border-b border-[#eef1f5] px-5 py-4">
 
                 <div className="min-w-0">
 
-                  <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f5452]">
-                    Filesystem / Action
+                  <div className="text-xs font-medium text-[#98a2b3]">
+                    Storage action
                   </div>
 
-                  <div className="mt-2 truncate font-mono text-[11px] text-[#e8e8e3]">
+                  <div className="mt-1 truncate text-base font-semibold text-[#172033]">
                     {dialog ===
                     "folder"
-                      ? "Create directory"
+                      ? "Create folder"
                       : actionItem?.name}
                   </div>
 
@@ -2131,26 +2236,20 @@ export default function StoragePage() {
                   onClick={
                     closeDialog
                   }
-                  className="
-                    flex
-                    size-8
-                    items-center
-                    justify-center
-                    text-[#4f5452]
-                    hover:text-[#e8e8e3]
-                  "
+                  className="flex size-8 items-center justify-center rounded-lg text-[#98a2b3] hover:bg-[#f7f9fc] hover:text-[#344054]"
                 >
                   <X className="size-4" />
                 </button>
 
               </div>
 
+
               <div className="p-5">
 
                 {dialog ===
                   "folder" && (
                   <>
-                    <div className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#4f5452]">
+                    <div className="text-xs font-medium text-[#344054]">
                       Folder name
                     </div>
 
@@ -2186,32 +2285,31 @@ export default function StoragePage() {
                       }}
                       placeholder="New folder"
                       className="
-                        mt-3
+                        mt-2
                         h-11
-                        rounded-none
-                        border-[#353a37]
-                        bg-[#090a0a]
-                        font-mono
-                        text-[10px]
-                        text-[#e8e8e3]
-                        placeholder:text-[#3f4441]
-                        focus-visible:border-[#b7ff4a]
-                        focus-visible:ring-0
+                        rounded-lg
+                        border-[#d0d5dd]
+                        bg-white
+                        text-sm
+                        text-[#172033]
+                        placeholder:text-[#98a2b3]
+                        focus-visible:border-[#2563eb]
+                        focus-visible:ring-4
+                        focus-visible:ring-[#2563eb]/10
                       "
                     />
 
-                    <div className="mt-3 font-mono text-[7px] leading-5 text-[#3f4441]">
-                      Created inside:
-                      {" "}
-                      {path || "/"}
+                    <div className="mt-2 text-xs text-[#98a2b3]">
+                      Created inside {path || "/"}
                     </div>
                   </>
                 )}
 
+
                 {dialog ===
                   "rename" && (
                   <>
-                    <div className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#4f5452]">
+                    <div className="text-xs font-medium text-[#344054]">
                       New name
                     </div>
 
@@ -2246,25 +2344,26 @@ export default function StoragePage() {
                         }
                       }}
                       className="
-                        mt-3
+                        mt-2
                         h-11
-                        rounded-none
-                        border-[#353a37]
-                        bg-[#090a0a]
-                        font-mono
-                        text-[10px]
-                        text-[#e8e8e3]
-                        focus-visible:border-[#b7ff4a]
-                        focus-visible:ring-0
+                        rounded-lg
+                        border-[#d0d5dd]
+                        bg-white
+                        text-sm
+                        text-[#172033]
+                        focus-visible:border-[#2563eb]
+                        focus-visible:ring-4
+                        focus-visible:ring-[#2563eb]/10
                       "
                     />
                   </>
                 )}
 
+
                 {dialog ===
                   "move" && (
                   <>
-                    <div className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#4f5452]">
+                    <div className="text-xs font-medium text-[#344054]">
                       Destination directory
                     </div>
 
@@ -2300,39 +2399,40 @@ export default function StoragePage() {
                       }}
                       placeholder="/Photos/"
                       className="
-                        mt-3
+                        mt-2
                         h-11
-                        rounded-none
-                        border-[#353a37]
-                        bg-[#090a0a]
-                        font-mono
-                        text-[10px]
-                        text-[#e8e8e3]
-                        placeholder:text-[#3f4441]
-                        focus-visible:border-[#b7ff4a]
-                        focus-visible:ring-0
+                        rounded-lg
+                        border-[#d0d5dd]
+                        bg-white
+                        text-sm
+                        text-[#172033]
+                        placeholder:text-[#98a2b3]
+                        focus-visible:border-[#2563eb]
+                        focus-visible:ring-4
+                        focus-visible:ring-[#2563eb]/10
                       "
                     />
 
-                    <div className="mt-3 font-mono text-[7px] leading-5 text-[#3f4441]">
-                      Enter the existing
-                      destination directory.
-                      The object keeps its
-                      current name.
+                    <div className="mt-2 text-xs leading-5 text-[#98a2b3]">
+                      Enter an existing destination directory. The object keeps its current name.
                     </div>
                   </>
                 )}
 
+
                 {dialog ===
                   "delete" && (
-                  <div className="border border-red-900/40 bg-red-950/10 p-4">
+                  <div className="rounded-lg border border-[#fecaca] bg-[#fef2f2] p-4">
 
-                    <div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.12em] text-red-400">
-                      <span className="size-1.5 bg-red-400" />
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#b42318]">
+
+                      <Trash2 className="size-3.5" />
+
                       Destructive operation
+
                     </div>
 
-                    <p className="mt-3 font-mono text-[9px] leading-5 text-red-300/70">
+                    <p className="mt-2 text-xs leading-5 text-[#b42318]/80">
                       {actionItem?.is_directory
                         ? `Delete "${actionItem.name}" and everything inside it?`
                         : `Delete "${actionItem?.name}" permanently?`}
@@ -2343,7 +2443,8 @@ export default function StoragePage() {
 
               </div>
 
-              <div className="flex justify-end gap-2 border-t border-[#292c2c] px-5 py-4">
+
+              <div className="flex justify-end gap-2 border-t border-[#eef1f5] px-5 py-4">
 
                 <button
                   type="button"
@@ -2355,20 +2456,20 @@ export default function StoragePage() {
                   }
                   className="
                     h-9
+                    rounded-lg
                     border
-                    border-[#292c2c]
+                    border-[#d0d5dd]
+                    bg-white
                     px-4
-                    font-mono
-                    text-[8px]
-                    uppercase
-                    tracking-[0.1em]
-                    text-[#737875]
-                    hover:bg-[#151717]
-                    hover:text-[#e8e8e3]
+                    text-xs
+                    font-medium
+                    text-[#344054]
+                    hover:bg-[#f7f9fc]
                   "
                 >
                   Cancel
                 </button>
+
 
                 <button
                   type="button"
@@ -2383,21 +2484,21 @@ export default function StoragePage() {
                     h-9
                     items-center
                     gap-2
+                    rounded-lg
                     px-4
-                    font-mono
-                    text-[8px]
-                    uppercase
-                    tracking-[0.1em]
+                    text-xs
+                    font-medium
                     ${
                       dialog ===
                       "delete"
-                        ? "bg-red-500/90 text-white hover:bg-red-500"
-                        : "bg-[#b7ff4a] text-[#080908] hover:bg-[#c7ff75]"
+                        ? "bg-[#dc2626] text-white hover:bg-[#b91c1c]"
+                        : "bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
                     }
                   `}
                 >
+
                   {dialogBusy && (
-                    <Loader2 className="size-3 animate-spin" />
+                    <Loader2 className="size-3.5 animate-spin" />
                   )}
 
                   {dialog ===
@@ -2410,6 +2511,7 @@ export default function StoragePage() {
                           "folder"
                         ? "Create"
                         : "Rename"}
+
                 </button>
 
               </div>
@@ -2418,6 +2520,7 @@ export default function StoragePage() {
 
           </div>
         )}
+
 
         {/* PREVIEW */}
 
@@ -2430,7 +2533,7 @@ export default function StoragePage() {
               flex
               items-center
               justify-center
-              bg-black/80
+              bg-[#101828]/55
               p-4
               backdrop-blur-sm
               sm:p-8
@@ -2445,23 +2548,23 @@ export default function StoragePage() {
             }}
           >
 
-            <div className="flex max-h-[90vh] w-full max-w-6xl flex-col border border-[#292c2c] bg-[#090a0a] shadow-2xl">
+            <div className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-xl border border-[#e4e8ef] bg-white shadow-[0_24px_64px_rgba(16,24,40,0.2)]">
 
-              <div className="flex items-center justify-between border-b border-[#292c2c] bg-[#0d0f0f] px-5 py-4">
+              <div className="flex items-center justify-between border-b border-[#eef1f5] px-5 py-4">
 
                 <div className="flex min-w-0 items-center gap-3">
 
-                  <div className="flex size-8 shrink-0 items-center justify-center border border-[#292c2c]">
-                    <File className="size-3.5 text-[#737875]" />
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#eff6ff]">
+                    <File className="size-4 text-[#2563eb]" />
                   </div>
 
                   <div className="min-w-0">
 
-                    <div className="truncate font-mono text-[10px] text-[#e8e8e3]">
+                    <div className="truncate text-sm font-semibold text-[#172033]">
                       {previewItem.name}
                     </div>
 
-                    <div className="mt-1 font-mono text-[7px] uppercase tracking-[0.12em] text-[#4f5452]">
+                    <div className="mt-0.5 truncate text-xs text-[#98a2b3]">
                       {previewItem.content_type ||
                         "FILE"}
                     </div>
@@ -2469,6 +2572,7 @@ export default function StoragePage() {
                   </div>
 
                 </div>
+
 
                 <div className="flex items-center gap-2">
 
@@ -2479,43 +2583,68 @@ export default function StoragePage() {
                         previewItem
                       )
                     }
-                    className="flex h-8 items-center gap-2 border border-[#292c2c] px-3 font-mono text-[8px] uppercase tracking-[0.08em] text-[#737875] hover:bg-[#151717] hover:text-[#e8e8e3]"
+                    className="
+                      hidden
+                      h-8
+                      items-center
+                      gap-2
+                      rounded-lg
+                      border
+                      border-[#d0d5dd]
+                      bg-white
+                      px-3
+                      text-xs
+                      font-medium
+                      text-[#344054]
+                      hover:bg-[#f7f9fc]
+                      sm:flex
+                    "
                   >
-                    <Download className="size-3" />
+                    <Download className="size-3.5" />
                     Download
                   </button>
+
 
                   <button
                     type="button"
                     onClick={
                       closePreview
                     }
-                    className="flex size-8 items-center justify-center border border-[#292c2c] font-mono text-sm text-[#737875] hover:bg-[#151717] hover:text-[#e8e8e3]"
+                    className="flex size-8 items-center justify-center rounded-lg text-[#98a2b3] hover:bg-[#f7f9fc] hover:text-[#344054]"
                   >
-                    ×
+                    <X className="size-4" />
                   </button>
 
                 </div>
 
               </div>
 
-              <div className="min-h-0 flex-1 overflow-auto bg-[#070808]">
+
+              <div className="min-h-0 flex-1 overflow-auto bg-[#f8fafc]">
 
                 {previewLoading ? (
 
                   <div className="flex min-h-[500px] flex-col items-center justify-center">
 
-                    <Loader2 className="size-5 animate-spin text-[#b7ff4a]" />
+                    <div className="flex size-11 items-center justify-center rounded-xl bg-[#eff6ff]">
 
-                    <div className="mt-4 font-mono text-[8px] uppercase tracking-[0.14em] text-[#4f5452]">
+                      <Loader2 className="size-5 animate-spin text-[#2563eb]" />
+
+                    </div>
+
+                    <div className="mt-4 text-sm font-medium text-[#344054]">
                       Loading object
+                    </div>
+
+                    <div className="mt-1 text-xs text-[#98a2b3]">
+                      Preparing preview
                     </div>
 
                   </div>
 
                 ) : previewText ? (
 
-                  <pre className="min-h-[500px] whitespace-pre-wrap break-words p-6 font-mono text-[11px] leading-6 text-[#c8ccc9]">
+                  <pre className="min-h-[500px] whitespace-pre-wrap break-words bg-white p-6 font-mono text-[11px] leading-6 text-[#344054]">
                     {previewText}
                   </pre>
 
@@ -2530,13 +2659,14 @@ export default function StoragePage() {
 
               </div>
 
-              <div className="flex items-center justify-between border-t border-[#292c2c] bg-[#0d0f0f] px-5 py-3">
 
-                <span className="font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
-                  JCLOUD / FILE PREVIEW
+              <div className="flex items-center justify-between border-t border-[#eef1f5] bg-white px-5 py-3">
+
+                <span className="text-xs text-[#98a2b3]">
+                  JCloud file preview
                 </span>
 
-                <span className="font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
+                <span className="font-mono text-[10px] text-[#98a2b3]">
                   {previewItem.size !==
                   null
                     ? formatBytes(

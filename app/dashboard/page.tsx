@@ -4,12 +4,13 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 import {
-  ArrowUpRight,
+  ArrowRight,
   Database,
   HardDrive,
   Loader2,
   Monitor,
   Rocket,
+  Server,
 } from "lucide-react"
 
 import { JCloudShell } from "@/components/jcloud/shell"
@@ -211,128 +212,221 @@ export default function Dashboard() {
 
   return (
     <JCloudShell>
-      <div className="j-scanlines space-y-0">
+      <div className="mx-auto w-full max-w-[1500px] space-y-8">
 
-        {/* INTRO */}
+        {/* ─────────────────────────────
+            PAGE HEADER
+        ───────────────────────────── */}
 
-        <section className="grid min-h-[420px] grid-cols-1 border-b border-[#292c2c] lg:grid-cols-[1fr_320px]">
+        <section className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
 
-          <div className="relative flex flex-col justify-between border-r border-[#292c2c] py-8 pr-8 lg:py-12">
+          <div>
 
-            <div className="j-label">
-              JCLOUD // PRIVATE INFRASTRUCTURE
+            <div className="flex items-center gap-2 text-xs font-medium text-[#667085]">
+              <Server className="size-3.5 text-[#2563eb]" />
+              Infrastructure
             </div>
 
-            <div className="py-10 lg:py-0">
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-[#172033] sm:text-4xl">
+              Dashboard
+            </h1>
 
-              <h1 className="j-display max-w-[850px] text-5xl font-medium uppercase tracking-[-0.045em] sm:text-6xl lg:text-7xl">
-                Your own
-                <br />
-                <span className="text-[#737875]">
-                  cloud.
-                </span>
-              </h1>
+            <p className="mt-2 text-sm text-[#667085]">
+              An overview of your private cloud infrastructure.
+            </p>
 
-              <div className="mt-8 flex max-w-xl items-start gap-4">
+          </div>
 
-                <div className="mt-1 size-2 shrink-0 bg-[#b7ff4a]" />
+          <div className="flex items-center gap-2 rounded-full border border-[#e4e8ef] bg-white px-3 py-2">
 
-                <p className="max-w-md font-mono text-[9px] leading-5 text-[#737875]">
-                  PRIVATE COMPUTE / STORAGE /
-                  APPLICATIONS / DATA.
-                  <br />
-                  CONTROLLED BY YOU.
-                </p>
+            <span
+              className={`size-2 rounded-full ${
+                online
+                  ? "bg-[#16a34a]"
+                  : "bg-[#dc2626]"
+              }`}
+            />
 
+            <span className="text-xs font-medium text-[#475467]">
+              {online
+                ? "JCloud is online"
+                : "JCloud is offline"}
+            </span>
+
+          </div>
+
+        </section>
+
+        {/* ─────────────────────────────
+            TELEMETRY
+        ───────────────────────────── */}
+
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+          {/* CPU */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+            <div className="flex items-start justify-between">
+
+              <div>
+                <div className="text-sm font-medium text-[#344054]">
+                  CPU load
+                </div>
+
+                <div className="mt-1 text-xs text-[#98a2b3]">
+                  Current system load
+                </div>
+              </div>
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#eff6ff]">
+                <Server className="size-4 text-[#2563eb]" />
               </div>
 
             </div>
 
-            <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-[#4f5452]">
-              NODE / 01 &nbsp;&nbsp; INDIA
+            <div className="mt-6 flex items-end justify-between">
+
+              <div className="font-mono text-3xl font-medium tracking-tight text-[#172033]">
+                {cpuLoad !== undefined
+                  ? formatLoad(cpuLoad)
+                  : "—"}
+              </div>
+
+              <span className="mb-1 text-xs text-[#98a2b3]">
+                1 min
+              </span>
+
+            </div>
+
+            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#eef2f7]">
+
+              <div
+                className="h-full rounded-full bg-[#2563eb] transition-all duration-500"
+                style={{
+                  width: `${Math.min(
+                    Math.max(
+                      (cpuLoad ?? 0) * 25,
+                      0
+                    ),
+                    100
+                  )}%`,
+                }}
+              />
+
             </div>
 
           </div>
 
+          {/* MEMORY */}
 
-          {/* NODE STATUS */}
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
 
-          <div className="flex flex-col justify-between py-8 lg:py-12 lg:pl-8">
+            <div className="flex items-start justify-between">
 
-            <div className="flex justify-between">
-
-              <span className="j-label">
-                NODE STATUS
-              </span>
-
-              <span
-                className={`font-mono text-[9px] ${
-                  online
-                    ? "text-[#b7ff4a]"
-                    : "text-[#737875]"
-                }`}
-              >
-                ● {online ? "ONLINE" : "OFFLINE"}
-              </span>
-
-            </div>
-
-
-            <div>
-
-              <div className="font-mono text-[9px] uppercase text-[#4f5452]">
-                Primary node
-              </div>
-
-              <div className="mt-2 font-mono text-sm">
-                JCLOUD-01
-              </div>
-
-              <div className="mt-1 font-mono text-[9px] text-[#737875]">
-                Ubuntu Server / KVM
-              </div>
-
-            </div>
-
-
-            {/* LIVE TELEMETRY */}
-
-            <div className="border-t border-[#292c2c] pt-5">
-
-              <div className="flex items-center justify-between">
-
-                <div className="j-label">
-                  TELEMETRY
+              <div>
+                <div className="text-sm font-medium text-[#344054]">
+                  Memory
                 </div>
 
-                {loading && (
-                  <Loader2 className="size-3 animate-spin text-[#4f5452]" />
-                )}
-
+                <div className="mt-1 text-xs text-[#98a2b3]">
+                  RAM currently in use
+                </div>
               </div>
 
-              <div className="mt-3 font-mono text-[9px] leading-6 text-[#737875]">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#fff8e7]">
+                <Monitor className="size-4 text-[#d99a16]" />
+              </div>
 
-                CPU LOAD&nbsp;
-                {cpuLoad !== undefined
-                  ? formatLoad(cpuLoad)
-                  : "WAITING"}
+            </div>
 
-                <br />
+            <div className="mt-6 flex items-end justify-between">
 
-                MEMORY&nbsp;&nbsp;
+              <div className="font-mono text-3xl font-medium tracking-tight text-[#172033]">
                 {memoryPercent !== undefined
                   ? formatPercent(memoryPercent)
-                  : "WAITING"}
+                  : "—"}
+              </div>
 
-                <br />
+              {memoryUsed !== undefined &&
+              memoryTotal !== undefined && (
+                <span className="mb-1 text-xs text-[#98a2b3]">
+                  {formatGB(memoryUsed)} /{" "}
+                  {formatGB(memoryTotal)}
+                </span>
+              )}
 
-                STORAGE&nbsp;
+            </div>
+
+            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#eef2f7]">
+
+              <div
+                className="h-full rounded-full bg-[#d99a16] transition-all duration-500"
+                style={{
+                  width: `${Math.min(
+                    Math.max(
+                      memoryPercent ?? 0,
+                      0
+                    ),
+                    100
+                  )}%`,
+                }}
+              />
+
+            </div>
+
+          </div>
+
+          {/* STORAGE */}
+
+          <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)] sm:col-span-2 xl:col-span-1">
+
+            <div className="flex items-start justify-between">
+
+              <div>
+                <div className="text-sm font-medium text-[#344054]">
+                  Storage
+                </div>
+
+                <div className="mt-1 text-xs text-[#98a2b3]">
+                  Primary disk usage
+                </div>
+              </div>
+
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#ecfdf3]">
+                <HardDrive className="size-4 text-[#16a34a]" />
+              </div>
+
+            </div>
+
+            <div className="mt-6 flex items-end justify-between">
+
+              <div className="font-mono text-3xl font-medium tracking-tight text-[#172033]">
                 {storagePercent !== undefined
                   ? formatPercent(storagePercent)
-                  : "WAITING"}
-
+                  : "—"}
               </div>
+
+              <span className="mb-1 text-xs text-[#98a2b3]">
+                System disk
+              </span>
+
+            </div>
+
+            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#eef2f7]">
+
+              <div
+                className="h-full rounded-full bg-[#16a34a] transition-all duration-500"
+                style={{
+                  width: `${Math.min(
+                    Math.max(
+                      storagePercent ?? 0,
+                      0
+                    ),
+                    100
+                  )}%`,
+                }}
+              />
 
             </div>
 
@@ -340,33 +434,33 @@ export default function Dashboard() {
 
         </section>
 
+        {/* ─────────────────────────────
+            RESOURCES
+        ───────────────────────────── */}
 
-        {/* SYSTEMS */}
+        <section>
 
-        <section className="py-10">
-
-          <div className="mb-6 flex items-end justify-between">
+          <div className="mb-4 flex items-end justify-between">
 
             <div>
 
-              <div className="j-label">
-                01 — SYSTEMS
-              </div>
-
-              <h2 className="mt-2 text-2xl font-medium tracking-tight">
-                Infrastructure
+              <h2 className="text-lg font-semibold tracking-tight text-[#172033]">
+                Resources
               </h2>
 
+              <p className="mt-1 text-xs text-[#98a2b3]">
+                Manage the services running on your node.
+              </p>
+
             </div>
 
-            <div className="hidden font-mono text-[8px] uppercase text-[#4f5452] sm:block">
-              04 SERVICES
-            </div>
+            <span className="hidden text-xs text-[#98a2b3] sm:block">
+              4 services
+            </span>
 
           </div>
 
-
-          <div className="grid border-l border-t border-[#292c2c] md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
 
             {systems.map((system) => {
 
@@ -376,32 +470,48 @@ export default function Dashboard() {
                 <Link
                   key={system.href}
                   href={system.href}
-                  className="group relative min-h-[250px] border-b border-r border-[#292c2c] p-6 transition-colors hover:bg-[#101212]"
+                  className="
+                    group
+                    rounded-xl
+                    border
+                    border-[#e4e8ef]
+                    bg-white
+                    p-5
+                    shadow-[0_2px_8px_rgba(16,24,40,0.03)]
+                    transition
+                    hover:-translate-y-0.5
+                    hover:border-[#cbd5e1]
+                    hover:shadow-[0_10px_30px_rgba(16,24,40,0.07)]
+                  "
                 >
 
                   <div className="flex items-start justify-between">
 
-                    <span className="font-mono text-[8px] text-[#4f5452]">
-                      {system.index}
-                    </span>
+                    <div className="flex size-11 items-center justify-center rounded-xl bg-[#f7f9fc] transition-colors group-hover:bg-[#eff6ff]">
 
-                    <ArrowUpRight className="size-4 text-[#4f5452] transition-transform group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-[#b7ff4a]" />
+                      <Icon className="size-5 text-[#667085] transition-colors group-hover:text-[#2563eb]" />
+
+                    </div>
+
+                    <div className="flex size-8 items-center justify-center rounded-lg text-[#98a2b3] transition-colors group-hover:bg-[#eff6ff] group-hover:text-[#2563eb]">
+
+                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+
+                    </div>
 
                   </div>
 
-                  <div className="absolute bottom-6 left-6 right-6">
+                  <div className="mt-7">
 
-                    <Icon className="mb-5 size-5 text-[#737875]" />
-
-                    <div className="font-mono text-[8px] tracking-[0.15em] text-[#737875]">
+                    <div className="text-xs font-medium uppercase tracking-wide text-[#98a2b3]">
                       {system.type}
                     </div>
 
-                    <div className="mt-1 text-2xl font-medium tracking-tight">
+                    <div className="mt-1 text-xl font-semibold tracking-tight text-[#172033]">
                       {system.name}
                     </div>
 
-                    <div className="mt-2 font-mono text-[9px] text-[#4f5452]">
+                    <div className="mt-1 text-sm text-[#667085]">
                       {system.description}
                     </div>
 
@@ -415,228 +525,235 @@ export default function Dashboard() {
 
         </section>
 
+        {/* ─────────────────────────────
+            STORAGE
+        ───────────────────────────── */}
 
-        {/* TELEMETRY */}
+        <section>
 
-        <section className="border-t border-[#292c2c] py-10">
-
-          <div className="grid gap-10 lg:grid-cols-[1fr_2fr]">
+          <div className="mb-4 flex items-end justify-between">
 
             <div>
 
-              <div className="j-label">
-                02 — TELEMETRY
-              </div>
-
-              <h2 className="mt-2 text-2xl font-medium tracking-tight">
-                System health
+              <h2 className="text-lg font-semibold tracking-tight text-[#172033]">
+                Storage
               </h2>
 
-              <p className="mt-4 max-w-sm font-mono text-[9px] leading-5 text-[#4f5452]">
-                Live infrastructure metrics from
-                the primary JCloud node.
+              <p className="mt-1 text-xs text-[#98a2b3]">
+                Storage allocation across your infrastructure.
               </p>
 
             </div>
 
+            {loading && (
+              <Loader2 className="size-4 animate-spin text-[#98a2b3]" />
+            )}
 
-            <div className="grid border-l border-t border-[#292c2c] sm:grid-cols-3">
+          </div>
 
-              {[
-                [
-                  "CPU LOAD",
-                  cpuLoad !== undefined
-                    ? formatLoad(cpuLoad)
-                    : "—",
-                ],
-                [
-                  "MEMORY",
-                  memoryPercent !== undefined
-                    ? formatPercent(memoryPercent)
-                    : "—",
-                ],
-                [
-                  "STORAGE",
-                  storagePercent !== undefined
-                    ? formatPercent(storagePercent)
-                    : "—",
-                ],
-              ].map(([label, value]) => (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
+            {poolDefinitions.map((definition) => {
+
+              const pool =
+                pools?.[definition.key]
+
+              const percent =
+                pool?.percent
+
+              const status =
+                poolStatus(pool)
+
+              const unavailable =
+                pool?.available === false
+
+              return (
                 <div
-                  key={label}
-                  className="border-b border-r border-[#292c2c] p-6"
+                  key={definition.key}
+                  className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]"
                 >
 
-                  <div className="j-label">
-                    {label}
-                  </div>
+                  <div className="flex items-start justify-between">
 
-                  <div className="mt-8 font-mono text-3xl">
-                    {value}
-                  </div>
+                    <div className="flex items-center gap-3">
 
-                  <div className="mt-2 font-mono text-[8px] uppercase text-[#4f5452]">
-                    Live telemetry
-                  </div>
+                      <div className="flex size-9 items-center justify-center rounded-lg bg-[#f7f9fc]">
 
-                </div>
+                        <HardDrive className="size-4 text-[#667085]" />
 
-              ))}
-
-            </div>
-
-          </div>
-
-
-          {/* MEMORY DETAIL */}
-
-          <div className="mt-6 grid border-l border-t border-[#292c2c] sm:grid-cols-2">
-
-            <div className="border-b border-r border-[#292c2c] p-5">
-
-              <div className="j-label">
-                MEMORY ALLOCATION
-              </div>
-
-              <div className="mt-3 font-mono text-sm">
-                {memoryUsed !== undefined &&
-                memoryTotal !== undefined
-                  ? `${formatGB(memoryUsed)} / ${formatGB(memoryTotal)}`
-                  : "—"}
-              </div>
-
-            </div>
-
-
-            <div className="border-b border-r border-[#292c2c] p-5">
-
-              <div className="j-label">
-                REFRESH
-              </div>
-
-              <div className="mt-3 font-mono text-sm text-[#737875]">
-                5 SECOND INTERVAL
-              </div>
-
-            </div>
-
-          </div>
-
-
-          {/* STORAGE POOLS */}
-
-          <div className="mt-10">
-
-            <div className="mb-6 flex items-end justify-between">
-
-              <div>
-
-                <div className="j-label">
-                  03 — STORAGE POOLS
-                </div>
-
-                <h2 className="mt-2 text-2xl font-medium tracking-tight">
-                  Infrastructure allocation
-                </h2>
-
-              </div>
-
-              <div className="hidden font-mono text-[8px] uppercase text-[#4f5452] sm:block">
-                05 POOLS
-              </div>
-
-            </div>
-
-
-            <div className="grid border-l border-t border-[#292c2c] md:grid-cols-2 lg:grid-cols-3">
-
-              {poolDefinitions.map((definition) => {
-
-                const pool =
-                  pools?.[definition.key]
-
-                const percent =
-                  pool?.percent
-
-                return (
-                  <div
-                    key={definition.key}
-                    className="border-b border-r border-[#292c2c] p-5"
-                  >
-
-                    <div className="flex items-start justify-between">
-
-                      <div className="j-label">
-                        {definition.name}
                       </div>
 
+                      <div>
+
+                        <div className="text-sm font-semibold text-[#172033]">
+                          {definition.name}
+                        </div>
+
+                        <div className="mt-0.5 text-[10px] text-[#98a2b3]">
+                          {definition.path}
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div
+                      className={`flex items-center gap-1.5 text-[10px] font-medium ${
+                        unavailable
+                          ? "text-[#dc2626]"
+                          : status === "WAITING"
+                            ? "text-[#98a2b3]"
+                            : "text-[#16a34a]"
+                      }`}
+                    >
                       <span
-                        className={`font-mono text-[8px] ${
-                          pool?.available === false
-                            ? "text-[#737875]"
-                            : "text-[#b7ff4a]"
+                        className={`size-1.5 rounded-full ${
+                          unavailable
+                            ? "bg-[#dc2626]"
+                            : status === "WAITING"
+                              ? "bg-[#98a2b3]"
+                              : "bg-[#16a34a]"
                         }`}
-                      >
-                        ● {poolStatus(pool)}
-                      </span>
-
-                    </div>
-
-
-                    <div className="mt-6 font-mono text-2xl">
-                      {formatPercent(percent)}
-                    </div>
-
-
-                    <div className="mt-3 h-1 bg-[#1a1d1d]">
-
-                      <div
-                        className="h-full bg-[#b7ff4a] transition-all duration-500"
-                        style={{
-                          width: `${Math.min(
-                            Math.max(percent ?? 0, 0),
-                            100
-                          )}%`,
-                        }}
                       />
 
-                    </div>
-
-
-                    <div className="mt-4 flex justify-between font-mono text-[8px] text-[#737875]">
-
-                      <span>
-                        {pool?.used !== undefined
-                          ? formatGB(pool.used)
-                          : "—"}
-                        {" USED"}
-                      </span>
-
-                      <span>
-                        {pool?.total !== undefined
-                          ? formatGB(pool.total)
-                          : "—"}
-                        {" TOTAL"}
-                      </span>
-
-                    </div>
-
-
-                    <div className="mt-3 font-mono text-[8px] text-[#4f5452]">
-                      {pool?.free !== undefined
-                        ? `${formatGB(pool.free)} FREE`
-                        : "WAITING"}
-                    </div>
-
-
-                    <div className="mt-2 truncate font-mono text-[8px] text-[#4f5452]">
-                      {pool?.path ?? definition.path}
+                      {status === "ONLINE"
+                        ? "Healthy"
+                        : status === "UNAVAILABLE"
+                          ? "Unavailable"
+                          : "Waiting"}
                     </div>
 
                   </div>
-                )
-              })}
+
+                  <div className="mt-7 flex items-end justify-between">
+
+                    <span className="font-mono text-2xl font-medium tracking-tight text-[#172033]">
+                      {formatPercent(percent)}
+                    </span>
+
+                    <span className="text-xs text-[#98a2b3]">
+                      used
+                    </span>
+
+                  </div>
+
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#eef2f7]">
+
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        unavailable
+                          ? "bg-[#dc2626]"
+                          : percent !== undefined &&
+                            percent >= 80
+                            ? "bg-[#d99a16]"
+                            : "bg-[#2563eb]"
+                      }`}
+                      style={{
+                        width: `${Math.min(
+                          Math.max(
+                            percent ?? 0,
+                            0
+                          ),
+                          100
+                        )}%`,
+                      }}
+                    />
+
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between text-xs">
+
+                    <span className="text-[#667085]">
+                      {pool?.used !== undefined
+                        ? formatGB(pool.used)
+                        : "—"}{" "}
+                      used
+                    </span>
+
+                    <span className="text-[#98a2b3]">
+                      {pool?.free !== undefined
+                        ? formatGB(pool.free)
+                        : "—"}{" "}
+                      free
+                    </span>
+
+                  </div>
+
+                </div>
+              )
+            })}
+
+          </div>
+
+        </section>
+
+        {/* ─────────────────────────────
+            NODE INFORMATION
+        ───────────────────────────── */}
+
+        <section className="rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
+
+          <div className="flex flex-col gap-4 border-b border-[#eef1f5] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+              <h2 className="text-sm font-semibold text-[#172033]">
+                Primary node
+              </h2>
+
+              <p className="mt-1 text-xs text-[#98a2b3]">
+                JCloud infrastructure host
+              </p>
+
+            </div>
+
+            <div className="flex items-center gap-2 rounded-full bg-[#ecfdf3] px-3 py-1.5 text-[11px] font-medium text-[#15803d]">
+
+              <span className="size-1.5 rounded-full bg-[#16a34a]" />
+
+              {online
+                ? "Operational"
+                : "Offline"}
+
+            </div>
+
+          </div>
+
+          <div className="grid sm:grid-cols-3">
+
+            <div className="border-b border-[#eef1f5] p-5 sm:border-b-0 sm:border-r">
+
+              <div className="text-xs text-[#98a2b3]">
+                Node
+              </div>
+
+              <div className="mt-2 font-mono text-sm text-[#344054]">
+                JCLOUD-01
+              </div>
+
+            </div>
+
+            <div className="border-b border-[#eef1f5] p-5 sm:border-b-0 sm:border-r">
+
+              <div className="text-xs text-[#98a2b3]">
+                Platform
+              </div>
+
+              <div className="mt-2 text-sm font-medium text-[#344054]">
+                Ubuntu Server / KVM
+              </div>
+
+            </div>
+
+            <div className="p-5">
+
+              <div className="text-xs text-[#98a2b3]">
+                Telemetry
+              </div>
+
+              <div className="mt-2 text-sm font-medium text-[#344054]">
+                Updated every 5 seconds
+              </div>
 
             </div>
 
@@ -644,54 +761,38 @@ export default function Dashboard() {
 
         </section>
 
+        {/* ─────────────────────────────
+            FOOTER
+        ───────────────────────────── */}
 
-        {/* FOOTER */}
+        <footer className="flex flex-col gap-3 border-t border-[#e4e8ef] py-5 text-xs text-[#98a2b3] sm:flex-row sm:items-center sm:justify-between">
 
-        <footer className="flex flex-col gap-5 border-t border-[#292c2c] py-6 font-mono text-[9px] uppercase tracking-[0.12em] text-[#4f5452] sm:flex-row sm:items-center sm:justify-between">
+          <span>
+            Built by Rohan · 2026
+          </span>
 
-          <div className="flex items-center gap-3">
-
-            <span>
-              JCLOUD / PRIVATE CLOUD
-            </span>
-
-            <span className="text-[#292c2c]">
-              /
-            </span>
-
-            <span>
-              2026
-            </span>
-
-          </div>
-
-
-          <div className="flex items-center gap-5">
-
-            <span className="text-[#737875]">
-              Built by Rohan
-            </span>
-
-            <span className="text-[#292c2c]">
-              /
-            </span>
+          <div className="flex items-center gap-4">
 
             <a
               href="https://github.com/rohansablecs"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-[#b7ff4a]"
+              className="transition-colors hover:text-[#2563eb]"
             >
-              GitHub ↗
+              GitHub
             </a>
+
+            <span className="text-[#d5dce7]">
+              ·
+            </span>
 
             <a
               href="https://www.linkedin.com/in/rohan-sable-5379643a7"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-[#b7ff4a]"
+              className="transition-colors hover:text-[#2563eb]"
             >
-              LinkedIn ↗
+              LinkedIn
             </a>
 
           </div>

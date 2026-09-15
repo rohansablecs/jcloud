@@ -1,13 +1,12 @@
 "use client"
 
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import {
   ArrowRight,
-  Cpu,
   KeyRound,
   Loader2,
   LockKeyhole,
-  Terminal,
+  ShieldCheck,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -16,68 +15,224 @@ import { authApi } from "@/lib/api"
 function JCloudLogo() {
   return (
     <svg
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
+      width="42"
+      height="34"
+      viewBox="0 0 42 34"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="JCloud"
     >
       <defs>
-        <mask id="jcloud-login-logo">
+        <mask
+          id="jcloud-login-logo"
+          maskUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width="42"
+          height="34"
+        >
           <rect
-            width="32"
-            height="32"
+            width="42"
+            height="34"
             fill="black"
           />
 
-          {/* FILLED CLOUD */}
+          {/* CLOUD */}
+
           <path
             d="
-              M8.2 24.2
-              H23
-              C26.8 24.2 29 21.8 29 18.7
-              C29 15.6 26.8 13.2 23.6 13
-              C22.5 9.4 19.3 7.1 15.5 7.1
-              C11 7.1 7.4 10.1 6.5 14.3
-              C3.7 14.5 1.7 16.5 1.7 19.2
-              C1.7 22.1 4.1 24.2 8.2 24.2
+              M10 27
+              H30
+              C36 27
+              40 23.7
+              40 19
+              C40 14.8
+              36.6 11.4
+              32 11.1
+              C30.6 6.1
+              26.3 2.8
+              21.1 2.8
+              C15.3 2.8
+              10.5 6.9
+              9.1 12
+              C4.1 12.2
+              0.8 15.4
+              0.8 19.7
+              C0.8 24
+              4.3 27
+              10 27
               Z
             "
             fill="white"
           />
 
-          {/* NEGATIVE-SPACE J */}
+          {/* J CUTOUT */}
+
           <path
             d="
-              M17.4 11.2
-              V19.2
-              C17.4 20.6 16.7 21.4 15.4 21.4
-              C14.1 21.4 13.4 20.6 13.4 19.3
+              M23.5 7
+              V17.7
+              C23.5 20.8
+              22 22.5
+              19.5 22.5
+              C17 22.5
+              15.2 20.8
+              15.2 18.3
             "
             stroke="black"
-            strokeWidth="2"
+            strokeWidth="3"
             strokeLinecap="round"
           />
 
           <path
-            d="M15.8 11.2H19"
+            d="M21 7 H26"
             stroke="black"
-            strokeWidth="2"
+            strokeWidth="3"
             strokeLinecap="round"
           />
         </mask>
       </defs>
 
       <rect
-        width="32"
-        height="32"
-        fill="#b7ff4a"
+        width="42"
+        height="34"
+        fill="#2563EB"
         mask="url(#jcloud-login-logo)"
       />
     </svg>
   )
 }
+
+
+/* =========================================================
+   REACT-BITS STYLE SPOTLIGHT
+   ========================================================= */
+
+function SpotlightCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  const [position, setPosition] = useState({
+    x: 50,
+    y: 50,
+  })
+
+  function handlePointerMove(
+    event: React.PointerEvent<HTMLDivElement>
+  ) {
+    const rect =
+      event.currentTarget.getBoundingClientRect()
+
+    setPosition({
+      x:
+        ((event.clientX - rect.left) /
+          rect.width) *
+        100,
+      y:
+        ((event.clientY - rect.top) /
+          rect.height) *
+        100,
+    })
+  }
+
+  return (
+    <div
+      onPointerMove={handlePointerMove}
+      className={`
+        relative
+        overflow-hidden
+        ${className}
+      `}
+    >
+
+      {/* CURSOR SPOTLIGHT */}
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          z-0
+          opacity-0
+          transition-opacity
+          duration-500
+          group-hover:opacity-100
+        "
+        style={{
+          background: `
+            radial-gradient(
+              500px circle at ${position.x}% ${position.y}%,
+              rgba(37,99,235,0.075),
+              transparent 42%
+            )
+          `,
+        }}
+      />
+
+      <div className="relative z-10">
+        {children}
+      </div>
+
+    </div>
+  )
+}
+
+
+/* =========================================================
+   ANIMATED BACKGROUND
+   ========================================================= */
+
+function LoginGrid() {
+  return (
+    <div
+      aria-hidden="true"
+      className="
+        pointer-events-none
+        absolute
+        inset-0
+        overflow-hidden
+      "
+    >
+
+      <div
+        className="
+          absolute
+          -inset-[64px]
+          opacity-[0.48]
+          [background-image:linear-gradient(to_right,#dbe7fb_1px,transparent_1px),linear-gradient(to_bottom,#dbe7fb_1px,transparent_1px)]
+          [background-size:32px_32px]
+          animate-[jcloudGrid_18s_linear_infinite]
+        "
+      />
+
+      <div
+        className="
+          absolute
+          inset-0
+          bg-[radial-gradient(circle_at_50%_45%,rgba(37,99,235,0.065),transparent_42%)]
+        "
+      />
+
+      <div
+        className="
+          absolute
+          inset-0
+          bg-[radial-gradient(circle_at_center,transparent_30%,#f6f8fc_82%)]
+        "
+      />
+
+    </div>
+  )
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
 
 export default function LoginPage() {
   const router = useRouter()
@@ -86,6 +241,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>
@@ -121,333 +281,336 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#070808] text-[#e8e8e3]">
+    <main className="relative min-h-screen overflow-hidden bg-[#f6f8fc] text-[#172033]">
 
-      {/* BACKGROUND GRID */}
+      <style>{`
+        @keyframes jcloudGrid {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+
+          100% {
+            transform: translate3d(32px, 32px, 0);
+          }
+        }
+
+        @keyframes jcloudReveal {
+          0% {
+            opacity: 0;
+            transform: translateY(14px);
+            filter: blur(8px);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+          }
+        }
+
+        @keyframes jcloudLogoReveal {
+          0% {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.96);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes jcloudPulse {
+          0%,
+          100% {
+            opacity: 0.55;
+            transform: scale(1);
+          }
+
+          50% {
+            opacity: 1;
+            transform: scale(1.12);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+          }
+        }
+      `}</style>
+
+
+      {/* BACKGROUND */}
+
+      <LoginGrid />
+
+
+      {/* =====================================================
+          BRAND
+      ===================================================== */}
 
       <div
-        className="
-          pointer-events-none
+        className={`
           absolute
-          inset-0
-          opacity-[0.13]
-          [background-image:linear-gradient(to_right,#292c2c_1px,transparent_1px),linear-gradient(to_bottom,#292c2c_1px,transparent_1px)]
-          [background-size:48px_48px]
-        "
-      />
-
-      {/* SUBTLE DEPTH */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          left-1/2
-          top-1/2
-          size-[720px]
-          -translate-x-1/2
-          -translate-y-1/2
-          rounded-full
-          bg-[#b7ff4a]/[0.018]
-          blur-[140px]
-        "
-      />
-
-      {/* TOP BAR */}
-
-      <header
-        className="
-          absolute
-          inset-x-0
-          top-0
+          left-6
+          top-6
           z-20
-          flex
-          h-[76px]
-          items-center
-          justify-between
-          border-b
-          border-[#292c2c]
-          bg-[#070808]/80
-          px-6
-          backdrop-blur-sm
-          lg:px-10
-        "
+          sm:left-8
+          sm:top-8
+          ${
+            mounted
+              ? "animate-[jcloudLogoReveal_700ms_cubic-bezier(.22,1,.36,1)_both]"
+              : "opacity-0"
+          }
+        `}
       >
-
-        {/* BRAND */}
 
         <div className="flex items-center gap-3">
 
-          <div className="flex size-8 shrink-0 items-center justify-center">
-            <JCloudLogo />
-          </div>
+          <JCloudLogo />
 
           <div>
 
-            <div className="font-mono text-[11px] font-medium tracking-[0.18em]">
-              JCLOUD
+            <div className="text-sm font-semibold tracking-tight text-[#172033]">
+              JCloud
             </div>
 
-            <div className="mt-1 font-mono text-[7px] tracking-[0.18em] text-[#4f5452]">
-              PRIVATE INFRASTRUCTURE
+            <div className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-[#98a2b3]">
+              Private infrastructure
             </div>
 
           </div>
 
         </div>
 
+      </div>
 
-        {/* SYSTEM STATUS */}
 
-        <div className="hidden items-center gap-6 font-mono text-[8px] uppercase tracking-[0.12em] text-[#4f5452] sm:flex">
+      {/* =====================================================
+          STATUS
+      ===================================================== */}
 
-          <span>
-            NODE / LOCAL
-          </span>
+      <div className="absolute right-6 top-7 z-20 sm:right-8 sm:top-9">
 
-          <span className="h-3 w-px bg-[#292c2c]" />
+        <div className="flex items-center gap-2 text-xs text-[#667085]">
 
-          <span className="flex items-center gap-2">
-            <span className="size-1.5 bg-[#b7ff4a]" />
-            SYSTEM READY
+          <span
+            className="
+              size-1.5
+              rounded-full
+              bg-[#16a34a]
+              animate-[jcloudPulse_2.5s_ease-in-out_infinite]
+            "
+          />
+
+          <span className="hidden sm:inline">
+            System operational
           </span>
 
         </div>
 
-      </header>
+      </div>
 
 
-      {/* MAIN */}
+      {/* =====================================================
+          LOGIN
+      ===================================================== */}
 
-      <div
-        className="
-          relative
-          z-10
-          flex
-          min-h-screen
-          items-center
-          justify-center
-          px-5
-          pb-12
-          pt-[100px]
-          lg:px-10
-          lg:pt-[110px]
-        "
-      >
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-5 py-24 sm:px-8">
 
-        <div className="grid w-full max-w-[1120px] lg:grid-cols-[1fr_440px]">
+        <SpotlightCard
+          className={`
+            group
+            w-full
+            max-w-[920px]
+            rounded-2xl
+            border
+            border-[#e4e8ef]
+            bg-white
+            shadow-[0_24px_80px_rgba(16,24,40,0.08)]
+            transition-shadow
+            duration-500
+            hover:shadow-[0_28px_90px_rgba(37,99,235,0.09)]
+            ${
+              mounted
+                ? "animate-[jcloudReveal_800ms_cubic-bezier(.22,1,.36,1)_both]"
+                : "opacity-0"
+            }
+          `}
+        >
 
-          {/* LEFT INFORMATION PANEL */}
-
-          <section
-            className="
-              hidden
-              min-h-[570px]
-              border
-              border-r-0
-              border-[#292c2c]
-              bg-[#090a0a]/90
-              p-10
-              lg:flex
-              lg:flex-col
-              lg:justify-between
-            "
-          >
-
-            <div>
-
-              <div className="mb-12 flex items-center gap-3 font-mono text-[8px] uppercase tracking-[0.16em] text-[#4f5452]">
-
-                <span className="size-1.5 bg-[#b7ff4a]" />
-
-                Secure access terminal
-
-              </div>
+          <div className="grid overflow-hidden lg:grid-cols-[1fr_430px]">
 
 
-              <div className="max-w-[560px]">
+            {/* =================================================
+                LEFT
+            ================================================= */}
 
-                <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#4f5452]">
-                  PRIVATE COMPUTE / STORAGE / NETWORK
-                </div>
+            <section className="relative hidden overflow-hidden border-r border-[#e4e8ef] bg-[#f8faff] p-10 lg:flex lg:flex-col lg:justify-between">
 
-                <h1
-                  className="
-                    mt-6
-                    text-[clamp(4rem,5.5vw,6.5rem)]
-                    font-medium
-                    leading-[0.9]
-                    tracking-[-0.055em]
-                  "
-                >
-                  Your
-                  <br />
-                  infrastructure.
-                  <br />
-                  <span className="text-[#b7ff4a]">
-                    Your control.
+              <div
+                className="
+                  pointer-events-none
+                  absolute
+                  -inset-16
+                  opacity-40
+                  [background-image:linear-gradient(to_right,#dbe7fb_1px,transparent_1px),linear-gradient(to_bottom,#dbe7fb_1px,transparent_1px)]
+                  [background-size:32px_32px]
+                  animate-[jcloudGrid_24s_linear_infinite]
+                "
+              />
+
+              <div className="relative">
+
+                <div className="flex items-center gap-2 text-xs font-medium text-[#2563eb]">
+
+                  <span className="flex size-7 items-center justify-center rounded-lg border border-[#dbe7fb] bg-white shadow-sm">
+
+                    <ShieldCheck className="size-3.5" />
+
                   </span>
-                </h1>
 
-                <p className="mt-9 max-w-md font-mono text-[9px] leading-6 text-[#555b58]">
-                  Unified access to your private
-                  infrastructure layer. Manage storage,
-                  compute, applications and services
-                  from a single control plane.
-                </p>
+                  Secure infrastructure access
 
-              </div>
-
-            </div>
-
-
-            {/* READOUT */}
-
-            <div className="grid grid-cols-2 border-t border-[#292c2c] pt-6">
-
-              <div>
-
-                <div className="font-mono text-[7px] uppercase tracking-[0.14em] text-[#3f4441]">
-                  Environment
                 </div>
 
-                <div className="mt-3 flex items-center gap-2 font-mono text-[9px] uppercase">
-                  <span className="size-1.5 bg-[#b7ff4a]" />
-                  Local node
-                </div>
 
-              </div>
+                <div className="mt-16 max-w-md">
 
-              <div>
+                  <h1 className="text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-[#172033]">
 
-                <div className="font-mono text-[7px] uppercase tracking-[0.14em] text-[#3f4441]">
-                  Encryption
-                </div>
+                    Your cloud.
+                    <br />
 
-                <div className="mt-3 font-mono text-[9px] uppercase">
-                  Session / JWT
+                    <span className="text-[#2563eb]">
+                      Your control.
+                    </span>
+
+                  </h1>
+
+                  <p className="mt-6 max-w-sm text-sm leading-6 text-[#667085]">
+                    Access your private compute, storage,
+                    applications and data from one secure
+                    control plane.
+                  </p>
+
                 </div>
 
               </div>
 
-            </div>
 
-          </section>
+              {/* EXISTING INFO */}
 
+              <div className="relative grid grid-cols-2 gap-3">
 
-          {/* AUTH PANEL */}
+                <div className="rounded-xl border border-[#dbe7fb] bg-white/85 p-4 backdrop-blur-sm transition-transform duration-500 hover:-translate-y-1">
 
-          <section
-            className="
-              relative
-              border
-              border-[#292c2c]
-              bg-[#0b0d0d]
-            "
-          >
+                  <div className="text-[10px] font-medium uppercase tracking-wide text-[#98a2b3]">
+                    Infrastructure
+                  </div>
 
-            {/* LIME TOP EDGE */}
+                  <div className="mt-2 text-sm font-semibold text-[#344054]">
+                    Private
+                  </div>
 
-            <div className="absolute inset-x-0 top-0 h-px bg-[#b7ff4a]" />
+                </div>
 
 
-            {/* PANEL CONTENT */}
+                <div className="rounded-xl border border-[#dbe7fb] bg-white/85 p-4 backdrop-blur-sm transition-transform duration-500 hover:-translate-y-1">
 
-            <div className="p-7 sm:p-9 lg:p-10">
+                  <div className="text-[10px] font-medium uppercase tracking-wide text-[#98a2b3]">
+                    Access
+                  </div>
 
-              {/* HEADER */}
+                  <div className="mt-2 text-sm font-semibold text-[#344054]">
+                    Protected
+                  </div>
 
-              <div className="flex items-start justify-between">
+                </div>
 
-                <div>
+              </div>
 
-                  <div className="flex items-center gap-2 font-mono text-[7px] uppercase tracking-[0.18em] text-[#4f5452]">
+            </section>
 
-                    <LockKeyhole className="size-3" />
 
-                    Authentication
+            {/* =================================================
+                RIGHT
+            ================================================= */}
+
+            <section className="p-7 sm:p-10">
+
+              <div className="mx-auto w-full max-w-sm">
+
+
+                {/* MOBILE BRAND */}
+
+                <div className="mb-10 flex items-center gap-3 lg:hidden">
+
+                  <JCloudLogo />
+
+                  <div>
+
+                    <div className="text-sm font-semibold text-[#172033]">
+                      JCloud
+                    </div>
+
+                    <div className="text-[10px] uppercase tracking-[0.12em] text-[#98a2b3]">
+                      Private infrastructure
+                    </div>
 
                   </div>
 
-                  <h2 className="mt-5 text-[34px] font-medium tracking-[-0.045em]">
-                    Sign in
+                </div>
+
+
+                {/* HEADER */}
+
+                <div>
+
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-[#eff6ff] transition-transform duration-300 hover:scale-105">
+
+                    <LockKeyhole className="size-4 text-[#2563eb]" />
+
+                  </div>
+
+
+                  <h2 className="mt-6 text-2xl font-semibold tracking-[-0.035em] text-[#172033]">
+                    Welcome back
                   </h2>
 
-                  <p className="mt-2 max-w-xs font-mono text-[8px] leading-5 text-[#4f5452]">
-                    Authenticate with your Nextcloud
-                    account to continue.
+                  <p className="mt-2 text-sm leading-5 text-[#667085]">
+                    Sign in with your Nextcloud account
+                    to access JCloud.
                   </p>
 
                 </div>
 
 
-                {/* STATUS MARK */}
+                {/* FORM */}
 
-                <div className="flex size-10 items-center justify-center border border-[#292c2c]">
+                <form
+                  onSubmit={handleSubmit}
+                  className="mt-9"
+                >
 
-                  <span className="flex size-4 items-center justify-center border border-[#b7ff4a]">
-
-                    <span className="size-1.5 bg-[#b7ff4a]" />
-
-                  </span>
-
-                </div>
-
-              </div>
+                  <div className="space-y-5">
 
 
-              {/* FORM */}
+                    {/* USERNAME */}
 
-              <form
-                onSubmit={handleSubmit}
-                className="mt-11"
-              >
+                    <div>
 
-                <div className="space-y-7">
-
-                  {/* USERNAME */}
-
-                  <div>
-
-                    <label
-                      htmlFor="username"
-                      className="
-                        flex
-                        items-center
-                        justify-between
-                        font-mono
-                        text-[7px]
-                        uppercase
-                        tracking-[0.16em]
-                        text-[#666c68]
-                      "
-                    >
-                      <span>
+                      <label
+                        htmlFor="username"
+                        className="mb-2 block text-xs font-medium text-[#344054]"
+                      >
                         Username
-                      </span>
-
-                      <span className="text-[#393d3b]">
-                        01
-                      </span>
-                    </label>
-
-
-                    <div
-                      className="
-                        group
-                        mt-3
-                        flex
-                        items-center
-                        border-b
-                        border-[#353a37]
-                        transition-colors
-                        focus-within:border-[#b7ff4a]
-                      "
-                    >
-
-                      <span className="pl-1 font-mono text-sm text-[#4f5452]">
-                        $
-                      </span>
+                      </label>
 
                       <input
                         id="username"
@@ -456,236 +619,235 @@ export default function LoginPage() {
                         onChange={(e) =>
                           setUsername(e.target.value)
                         }
-                        placeholder="username"
+                        placeholder="Enter your username"
                         autoComplete="username"
                         disabled={loading}
                         className="
-                          h-12
+                          h-11
                           w-full
-                          border-0
-                          bg-transparent
+                          rounded-lg
+                          border
+                          border-[#d0d5dd]
+                          bg-white
                           px-3
-                          font-mono
-                          text-[12px]
-                          text-[#e8e8e3]
+                          text-sm
+                          text-[#172033]
                           outline-none
-                          placeholder:text-[#343836]
+                          transition
+                          duration-200
+                          placeholder:text-[#98a2b3]
+                          hover:border-[#98a2b3]
+                          focus:border-[#2563eb]
+                          focus:ring-4
+                          focus:ring-[#2563eb]/10
+                          disabled:cursor-not-allowed
+                          disabled:bg-[#f7f9fc]
                         "
                       />
 
                     </div>
 
-                  </div>
 
+                    {/* PASSWORD */}
 
-                  {/* PASSWORD */}
+                    <div>
 
-                  <div>
-
-                    <label
-                      htmlFor="password"
-                      className="
-                        flex
-                        items-center
-                        justify-between
-                        font-mono
-                        text-[7px]
-                        uppercase
-                        tracking-[0.16em]
-                        text-[#666c68]
-                      "
-                    >
-                      <span>
+                      <label
+                        htmlFor="password"
+                        className="mb-2 block text-xs font-medium text-[#344054]"
+                      >
                         Password
-                      </span>
+                      </label>
 
-                      <span className="text-[#393d3b]">
-                        02
-                      </span>
-                    </label>
+                      <div className="relative">
 
+                        <KeyRound className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#98a2b3]" />
 
-                    <div
-                      className="
-                        mt-3
-                        flex
-                        items-center
-                        border-b
-                        border-[#353a37]
-                        transition-colors
-                        focus-within:border-[#b7ff4a]
-                      "
-                    >
-
-                      <KeyRound className="ml-1 size-3 text-[#4f5452]" />
-
-                      <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) =>
-                          setPassword(e.target.value)
-                        }
-                        placeholder="••••••••••••"
-                        autoComplete="current-password"
-                        disabled={loading}
-                        className="
-                          h-12
-                          w-full
-                          border-0
-                          bg-transparent
-                          px-3
-                          font-mono
-                          text-[12px]
-                          tracking-[0.15em]
-                          text-[#e8e8e3]
-                          outline-none
-                          placeholder:text-[#343836]
-                        "
-                      />
-
-                    </div>
-
-                  </div>
-
-
-                  {/* ERROR */}
-
-                  {error && (
-                    <div className="border border-red-900/40 bg-red-950/10 px-4 py-3">
-
-                      <div className="flex items-center gap-2 font-mono text-[7px] uppercase tracking-[0.1em] text-red-400">
-
-                        <span className="size-1.5 bg-red-400" />
-
-                        Authentication error
+                        <input
+                          id="password"
+                          type="password"
+                          value={password}
+                          onChange={(e) =>
+                            setPassword(e.target.value)
+                          }
+                          placeholder="Enter your password"
+                          autoComplete="current-password"
+                          disabled={loading}
+                          className="
+                            h-11
+                            w-full
+                            rounded-lg
+                            border
+                            border-[#d0d5dd]
+                            bg-white
+                            pl-10
+                            pr-3
+                            text-sm
+                            text-[#172033]
+                            outline-none
+                            transition
+                            duration-200
+                            placeholder:text-[#98a2b3]
+                            hover:border-[#98a2b3]
+                            focus:border-[#2563eb]
+                            focus:ring-4
+                            focus:ring-[#2563eb]/10
+                            disabled:cursor-not-allowed
+                            disabled:bg-[#f7f9fc]
+                          "
+                        />
 
                       </div>
 
-                      <p className="mt-2 font-mono text-[8px] leading-5 text-red-300/70">
-                        {error}
-                      </p>
-
                     </div>
-                  )}
 
 
-                  {/* SUBMIT */}
+                    {/* ERROR */}
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="
-                      group
-                      flex
-                      h-12
-                      w-full
-                      items-center
-                      justify-between
-                      border
-                      border-[#b7ff4a]
-                      bg-[#b7ff4a]
-                      px-4
-                      font-mono
-                      text-[8px]
-                      font-medium
-                      uppercase
-                      tracking-[0.15em]
-                      text-[#080908]
-                      transition-colors
-                      hover:bg-[#c7ff75]
-                      disabled:cursor-not-allowed
-                      disabled:opacity-60
-                    "
-                  >
+                    {error && (
 
-                    <span className="flex items-center gap-2">
+                      <div className="animate-[jcloudReveal_300ms_ease-out_both] rounded-lg border border-[#fecaca] bg-[#fef2f2] px-4 py-3">
 
-                      {loading ? (
-                        <>
-                          <Loader2 className="size-3 animate-spin" />
-                          Authenticating
-                        </>
-                      ) : (
-                        "Initialize session"
-                      )}
+                        <div className="flex items-center gap-2 text-xs font-semibold text-[#b42318]">
 
-                    </span>
+                          <span className="size-1.5 rounded-full bg-[#dc2626]" />
 
-                    {!loading && (
-                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                          Authentication failed
+
+                        </div>
+
+                        <p className="mt-1.5 text-xs leading-5 text-[#b42318]/80">
+                          {error}
+                        </p>
+
+                      </div>
+
                     )}
 
-                  </button>
+
+                    {/* BUTTON */}
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="
+                        group/button
+                        relative
+                        flex
+                        h-11
+                        w-full
+                        items-center
+                        justify-between
+                        overflow-hidden
+                        rounded-lg
+                        bg-[#2563eb]
+                        px-4
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-sm
+                        transition-all
+                        duration-200
+                        hover:-translate-y-0.5
+                        hover:bg-[#1d4ed8]
+                        hover:shadow-[0_8px_24px_rgba(37,99,235,0.2)]
+                        focus:outline-none
+                        focus:ring-4
+                        focus:ring-[#2563eb]/15
+                        active:translate-y-0
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
+                      "
+                    >
+
+                      {/* BUTTON LIGHT */}
+
+                      <span
+                        aria-hidden="true"
+                        className="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          -left-1/3
+                          w-1/3
+                          rotate-12
+                          bg-white/10
+                          blur-md
+                          transition-transform
+                          duration-700
+                          group-hover/button:translate-x-[430%]
+                        "
+                      />
+
+                      <span className="relative flex items-center gap-2">
+
+                        {loading ? (
+                          <>
+                            <Loader2 className="size-4 animate-spin" />
+                            Signing in...
+                          </>
+                        ) : (
+                          "Sign in"
+                        )}
+
+                      </span>
+
+
+                      {!loading && (
+                        <ArrowRight
+                          className="
+                            relative
+                            size-4
+                            transition-transform
+                            duration-200
+                            group-hover/button:translate-x-1
+                          "
+                        />
+                      )}
+
+                    </button>
+
+                  </div>
+
+                </form>
+
+
+                {/* SECURITY */}
+
+                <div className="mt-8 flex items-start gap-3 border-t border-[#eef1f5] pt-5">
+
+                  <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#16a34a]" />
+
+                  <p className="text-[11px] leading-5 text-[#98a2b3]">
+                    Your session is authenticated through
+                    the JCloud control plane. Access is limited
+                    to authorized infrastructure users.
+                  </p>
 
                 </div>
 
-              </form>
 
+                {/* SIGNATURE */}
 
-              {/* FOOTER */}
-
-              <div className="mt-11 border-t border-[#202323] pt-5">
-
-                <div className="flex items-center justify-between font-mono text-[7px] uppercase tracking-[0.12em] text-[#3f4441]">
+                <div className="mt-7 flex items-center justify-between text-[10px] text-[#b0b8c5]">
 
                   <span>
-                    JCLOUD AUTH / 01
+                    Built by Rohan · 2026
                   </span>
 
                   <span>
-                    SESSION SECURE
+                    v0.1.0
                   </span>
 
                 </div>
 
               </div>
 
-            </div>
+            </section>
 
-          </section>
+          </div>
 
-        </div>
-
-      </div>
-
-
-      {/* BOTTOM STATUS */}
-
-      <div
-        className="
-          absolute
-          inset-x-0
-          bottom-0
-          z-20
-          hidden
-          h-8
-          items-center
-          justify-between
-          border-t
-          border-[#202323]
-          px-6
-          font-mono
-          text-[7px]
-          uppercase
-          tracking-[0.12em]
-          text-[#3b403e]
-          lg:flex
-          lg:px-10
-        "
-      >
-
-        <span>
-          JCLOUD / CONTROL PLANE
-        </span>
-
-        <span>
-          AUTHORIZED ACCESS ONLY
-        </span>
-
-        <span>
-          v0.1.0
-        </span>
+        </SpotlightCard>
 
       </div>
 

@@ -19,8 +19,13 @@ const mono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "JCloud",
-  description: "Private cloud infrastructure",
+  title: {
+    default: "JCloud",
+    template: "%s — JCloud",
+  },
+
+  description:
+    "Private cloud infrastructure for files, machines, applications, databases, and backups.",
 }
 
 export default function RootLayout({
@@ -30,7 +35,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${sans.variable} ${mono.variable}`}>
+      <body
+        className={`${sans.variable} ${mono.variable} min-h-screen bg-[#f6f8fb] text-[#172033]`}
+      >
         {children}
       </body>
     </html>
