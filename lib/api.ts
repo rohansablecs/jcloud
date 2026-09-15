@@ -1,5 +1,42 @@
 const API_URL = "https://jcloud.taile8e3b7.ts.net/api"
 
+const TOKEN_KEY = "jcloud_access_token"
+
+function getAccessToken(): string | null {
+  if (typeof window === "undefined") {
+    return null
+  }
+
+  return localStorage.getItem(TOKEN_KEY)
+}
+
+function setAccessToken(token: string) {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(TOKEN_KEY, token)
+  }
+}
+
+function clearAccessToken() {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(TOKEN_KEY)
+  }
+}
+
+function authHeaders(
+  headers?: HeadersInit
+): Headers {
+  const result = new Headers(headers)
+
+  const token = getAccessToken()
+
+  if (token) {
+    result.set("Authorization", `Bearer ${token}`)
+  }
+
+  return result
+}
+
+
 async function request<T>(
   path: string,
   options: RequestInit = {}
@@ -8,6 +45,7 @@ async function request<T>(
     `${API_URL}${path}`,
     {
       ...options,
+      headers: authHeaders(options.headers),
       credentials: "include",
     }
   )
@@ -23,6 +61,10 @@ async function request<T>(
         message = data.detail
       }
     } catch {}
+
+    if (response.status === 401) {
+      clearAccessToken()
+    }
 
     throw new Error(message)
   }
@@ -45,13 +87,14 @@ export type UserProfile = {
 }
 
 export const authApi = {
-  login(
+  async login(
     username: string,
     password: string
   ) {
-    return request<{
+    const data = await request<{
       authenticated: boolean
       username: string
+      token: string
     }>("/auth/login", {
       method: "POST",
       headers: {
@@ -62,14 +105,22 @@ export const authApi = {
         password,
       }),
     })
+
+    setAccessToken(data.token)
+
+    return data
   },
 
-  logout() {
-    return request<{
-      authenticated: boolean
-    }>("/auth/logout", {
-      method: "POST",
-    })
+  async logout() {
+    try {
+      return await request<{
+        authenticated: boolean
+      }>("/auth/logout", {
+        method: "POST",
+      })
+    } finally {
+      clearAccessToken()
+    }
   },
 
   me() {
@@ -124,6 +175,7 @@ export const storageApi = {
       {
         method: "POST",
         credentials: "include",
+        headers: authHeaders(),
         body: formData,
       }
     ).then(async (response) => {
@@ -138,6 +190,10 @@ export const storageApi = {
             message = data.detail
           }
         } catch {}
+
+        if (response.status === 401) {
+          clearAccessToken()
+        }
 
         throw new Error(message)
       }
@@ -162,6 +218,7 @@ export const storageApi = {
       {
         method: "POST",
         credentials: "include",
+        headers: authHeaders(),
         body: formData,
       }
     ).then(async (response) => {
@@ -176,6 +233,10 @@ export const storageApi = {
             message = data.detail
           }
         } catch {}
+
+        if (response.status === 401) {
+          clearAccessToken()
+        }
 
         throw new Error(message)
       }
@@ -233,6 +294,7 @@ export const storageApi = {
       `${API_URL}/storage/download?path=${encodeURIComponent(path)}`,
       {
         credentials: "include",
+        headers: authHeaders(),
       }
     )
 
@@ -247,6 +309,10 @@ export const storageApi = {
           message = data.detail
         }
       } catch {}
+
+      if (response.status === 401) {
+        clearAccessToken()
+      }
 
       throw new Error(message)
     }
