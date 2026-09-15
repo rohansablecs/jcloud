@@ -25,48 +25,13 @@ import {
 import Link from "next/link"
 import { use, useCallback, useEffect, useState } from "react"
 
-import { Button } from "@/components/ui/button"
 import { JCloudShell } from "@/components/jcloud/shell"
-
-type DatabaseItem = {
-  id: string
-  name: string
-  database_type: "postgresql" | "mysql" | "redis"
-  image: string
-  status: string
-  state: string
-  created: string
-  port: number
-  database_name: string | null
-  username: string | null
-  restart_policy: string
-  cpu_limit: number | null
-  memory_limit: number | null
-  mounts: {
-    type: string | null
-    source: string | null
-    destination: string | null
-    read_only: boolean
-  }[]
-  host: string
-}
-
-type Credentials = {
-  database_type: string
-  host: string
-  port: number
-  database_name: string | null
-  username: string | null
-  password: string | null
-  connection_string: string | null
-}
-
-type Stats = {
-  cpu_percent: number
-  memory_usage: number
-  memory_limit: number
-  memory_percent: number
-}
+import {
+  databasesApi,
+  type Database as DatabaseItem,
+  type DatabaseCredentials as Credentials,
+  type DatabaseStats as Stats,
+} from "@/lib/api"
 
 function engineLabel(type: DatabaseItem["database_type"]) {
   if (type === "postgresql") return "PostgreSQL"
@@ -90,10 +55,7 @@ function formatBytes(bytes: number | null | undefined) {
 }
 
 function statusIsRunning(database: DatabaseItem) {
-  return (
-    database.status === "running" ||
-    database.state === "running"
-  )
+  return database.status === "running" || database.state === "running"
 }
 
 export default function DatabaseDetailPage({
@@ -103,65 +65,31 @@ export default function DatabaseDetailPage({
 }) {
   const { id } = use(params)
 
-  const [database, setDatabase] =
-    useState<DatabaseItem | null>(null)
-
-  const [credentials, setCredentials] =
-    useState<Credentials | null>(null)
-
-  const [stats, setStats] =
-    useState<Stats | null>(null)
-
-  const [logs, setLogs] =
-    useState("")
+  const [database, setDatabase] = useState<DatabaseItem | null>(null)
+  const [credentials, setCredentials] = useState<Credentials | null>(null)
+  const [stats, setStats] = useState<Stats | null>(null)
+  const [logs, setLogs] = useState("")
 
   const [loading, setLoading] = useState(true)
-  const [loadingCredentials, setLoadingCredentials] =
-    useState(false)
+  const [loadingCredentials, setLoadingCredentials] = useState(false)
 
-  const [logsOpen, setLogsOpen] =
-    useState(false)
+  const [logsOpen, setLogsOpen] = useState(false)
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const [connectionVisible, setConnectionVisible] = useState(false)
 
-  const [passwordVisible, setPasswordVisible] =
-    useState(false)
-
-  const [connectionVisible, setConnectionVisible] =
-    useState(false)
-
-  const [action, setAction] =
-    useState<"start" | "stop" | "restart" | "delete" | null>(
-      null,
-    )
+  const [action, setAction] = useState<
+    "start" | "stop" | "restart" | "delete" | null
+  >(null)
 
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
-
-  const [deleteOpen, setDeleteOpen] =
-    useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   const loadDatabase = useCallback(async () => {
     try {
-      const response = await fetch(
-        `/api/databases/${id}`,
-        {
-          credentials: "include",
-          cache: "no-store",
-        },
-      )
-
-      if (!response.ok) {
-        const data = await response
-          .json()
-          .catch(() => null)
-
-        throw new Error(
-          data?.detail ||
-            "Unable to load database.",
-        )
-      }
-
-      const data = await response.json()
+      const data = await databasesApi.get(id)
       setDatabase(data)
+      setError("")
     } catch (err) {
       setError(
         err instanceof Error
@@ -175,17 +103,7 @@ export default function DatabaseDetailPage({
 
   const loadStats = useCallback(async () => {
     try {
-      const response = await fetch(
-        `/api/databases/${id}/stats`,
-        {
-          credentials: "include",
-          cache: "no-store",
-        },
-      )
-
-      if (!response.ok) return
-
-      const data = await response.json()
+      const data = await databasesApi.stats(id)
 
       setStats({
         cpu_percent: data.cpu_percent,
@@ -194,7 +112,7 @@ export default function DatabaseDetailPage({
         memory_percent: data.memory_percent,
       })
     } catch {
-      // Stats are intentionally best effort.
+      // Best effort.
     }
   }, [id])
 
@@ -210,19 +128,15 @@ export default function DatabaseDetailPage({
 
     loadStats()
 
-    const interval =
-      window.setInterval(loadStats, 5000)
+    const interval = window.setInterval(loadStats, 5000)
 
-    return () =>
-      window.clearInterval(interval)
+    return () => window.clearInterval(interval)
   }, [database, loadStats])
 
   useEffect(() => {
-    const interval =
-      window.setInterval(loadDatabase, 5000)
+    const interval = window.setInterval(loadDatabase, 5000)
 
-    return () =>
-      window.clearInterval(interval)
+    return () => window.clearInterval(interval)
   }, [loadDatabase])
 
   useEffect(() => {
@@ -248,25 +162,7 @@ export default function DatabaseDetailPage({
     setError("")
 
     try {
-      const response = await fetch(
-        `/api/databases/${id}/credentials`,
-        {
-          credentials: "include",
-          cache: "no-store",
-        },
-      )
-
-      const data = await response
-        .json()
-        .catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            "Unable to load credentials.",
-        )
-      }
-
+      const data = await databasesApi.credentials(id)
       setCredentials(data)
     } catch (err) {
       setError(
@@ -280,33 +176,21 @@ export default function DatabaseDetailPage({
   }
 
   async function performAction(
-    nextAction:
-      | "start"
-      | "stop"
-      | "restart",
+    nextAction: "start" | "stop" | "restart",
   ) {
     setError("")
     setSuccess("")
     setAction(nextAction)
 
     try {
-      const response = await fetch(
-        `/api/databases/${id}/${nextAction}`,
-        {
-          method: "POST",
-          credentials: "include",
-        },
-      )
+      let data: DatabaseItem
 
-      const data = await response
-        .json()
-        .catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            `Unable to ${nextAction} database.`,
-        )
+      if (nextAction === "start") {
+        data = await databasesApi.start(id)
+      } else if (nextAction === "stop") {
+        data = await databasesApi.stop(id)
+      } else {
+        data = await databasesApi.restart(id)
       }
 
       setDatabase(data)
@@ -339,24 +223,7 @@ export default function DatabaseDetailPage({
     setAction("delete")
 
     try {
-      const response = await fetch(
-        `/api/databases/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      )
-
-      const data = await response
-        .json()
-        .catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            "Unable to delete database.",
-        )
-      }
+      await databasesApi.delete(id)
 
       window.location.href = "/databases"
     } catch (err) {
@@ -372,24 +239,7 @@ export default function DatabaseDetailPage({
 
   async function loadLogs() {
     try {
-      const response = await fetch(
-        `/api/databases/${id}/logs?tail=300`,
-        {
-          credentials: "include",
-          cache: "no-store",
-        },
-      )
-
-      const data = await response
-        .json()
-        .catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            "Unable to load logs.",
-        )
-      }
+      const data = await databasesApi.logs(id)
 
       setLogs(data.logs || "")
       setLogsOpen(true)
@@ -444,8 +294,7 @@ export default function DatabaseDetailPage({
             </h1>
 
             <p className="mt-2 text-sm text-[#667085]">
-              {error ||
-                "The requested database could not be found."}
+              {error || "The requested database could not be found."}
             </p>
           </div>
         </div>
@@ -458,8 +307,6 @@ export default function DatabaseDetailPage({
   return (
     <JCloudShell>
       <div className="mx-auto w-full max-w-[1500px] space-y-7">
-        {/* HEADER */}
-
         <section>
           <Link
             href="/databases"
@@ -473,11 +320,9 @@ export default function DatabaseDetailPage({
             <div>
               <div className="flex items-center gap-3">
                 <div className="flex size-11 items-center justify-center rounded-xl border border-[#e4e8ef] bg-[#f8fafc] text-xs font-bold text-[#475467]">
-                  {database.database_type ===
-                  "postgresql"
+                  {database.database_type === "postgresql"
                     ? "PG"
-                    : database.database_type ===
-                        "mysql"
+                    : database.database_type === "mysql"
                       ? "MY"
                       : "RD"}
                 </div>
@@ -497,23 +342,15 @@ export default function DatabaseDetailPage({
                     >
                       <span
                         className={`size-1.5 rounded-full ${
-                          running
-                            ? "bg-[#12b76a]"
-                            : "bg-[#98a2b3]"
+                          running ? "bg-[#12b76a]" : "bg-[#98a2b3]"
                         }`}
                       />
-
-                      {running
-                        ? "Running"
-                        : database.status}
+                      {running ? "Running" : database.status}
                     </span>
                   </div>
 
                   <p className="mt-1 text-sm text-[#667085]">
-                    {engineLabel(
-                      database.database_type,
-                    )}{" "}
-                    · {database.image}
+                    {engineLabel(database.database_type)} · {database.image}
                   </p>
                 </div>
               </div>
@@ -522,9 +359,7 @@ export default function DatabaseDetailPage({
             <div className="flex flex-wrap items-center gap-2">
               {running ? (
                 <button
-                  onClick={() =>
-                    performAction("stop")
-                  }
+                  onClick={() => performAction("stop")}
                   disabled={action !== null}
                   className="flex h-9 items-center gap-2 rounded-lg border border-[#e4e8ef] px-3 text-xs font-semibold text-[#344054] hover:bg-[#f8fafc] disabled:opacity-50"
                 >
@@ -537,9 +372,7 @@ export default function DatabaseDetailPage({
                 </button>
               ) : (
                 <button
-                  onClick={() =>
-                    performAction("start")
-                  }
+                  onClick={() => performAction("start")}
                   disabled={action !== null}
                   className="flex h-9 items-center gap-2 rounded-lg border border-[#e4e8ef] px-3 text-xs font-semibold text-[#344054] hover:bg-[#f8fafc] disabled:opacity-50"
                 >
@@ -553,9 +386,7 @@ export default function DatabaseDetailPage({
               )}
 
               <button
-                onClick={() =>
-                  performAction("restart")
-                }
+                onClick={() => performAction("restart")}
                 disabled={action !== null}
                 className="flex h-9 items-center gap-2 rounded-lg border border-[#e4e8ef] px-3 text-xs font-semibold text-[#344054] hover:bg-[#f8fafc] disabled:opacity-50"
               >
@@ -586,8 +417,6 @@ export default function DatabaseDetailPage({
           </div>
         </section>
 
-        {/* ALERTS */}
-
         {(error || success) && (
           <div
             className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm ${
@@ -602,9 +431,7 @@ export default function DatabaseDetailPage({
               <Check className="size-4 shrink-0" />
             )}
 
-            <span className="flex-1">
-              {error || success}
-            </span>
+            <span className="flex-1">{error || success}</span>
 
             <button
               onClick={() => {
@@ -617,22 +444,15 @@ export default function DatabaseDetailPage({
           </div>
         )}
 
-        {/* METRICS */}
-
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#667085]">
-                CPU
-              </span>
-
+              <span className="text-xs font-medium text-[#667085]">CPU</span>
               <Activity className="size-4 text-[#98a2b3]" />
             </div>
 
             <div className="mt-3 text-2xl font-semibold text-[#172033]">
-              {stats
-                ? `${stats.cpu_percent.toFixed(1)}%`
-                : "—"}
+              {stats ? `${stats.cpu_percent.toFixed(1)}%` : "—"}
             </div>
 
             <div className="mt-1 text-xs text-[#98a2b3]">
@@ -647,33 +467,25 @@ export default function DatabaseDetailPage({
               <span className="text-xs font-medium text-[#667085]">
                 Memory
               </span>
-
               <MemoryStick className="size-4 text-[#98a2b3]" />
             </div>
 
             <div className="mt-3 text-2xl font-semibold text-[#172033]">
-              {stats
-                ? `${stats.memory_percent.toFixed(0)}%`
-                : "—"}
+              {stats ? `${stats.memory_percent.toFixed(0)}%` : "—"}
             </div>
 
             <div className="mt-1 text-xs text-[#98a2b3]">
               {stats
                 ? `${formatBytes(stats.memory_usage)} used`
                 : database.memory_limit
-                  ? formatBytes(
-                      database.memory_limit,
-                    )
+                  ? formatBytes(database.memory_limit)
                   : "No memory limit"}
             </div>
           </div>
 
           <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#667085]">
-                Port
-              </span>
-
+              <span className="text-xs font-medium text-[#667085]">Port</span>
               <Server className="size-4 text-[#98a2b3]" />
             </div>
 
@@ -691,14 +503,11 @@ export default function DatabaseDetailPage({
               <span className="text-xs font-medium text-[#667085]">
                 Storage
               </span>
-
               <HardDrive className="size-4 text-[#98a2b3]" />
             </div>
 
             <div className="mt-3 text-2xl font-semibold text-[#172033]">
-              {database.mounts.length
-                ? "Persistent"
-                : "Ephemeral"}
+              {database.mounts.length ? "Persistent" : "Ephemeral"}
             </div>
 
             <div className="mt-1 text-xs text-[#98a2b3]">
@@ -709,22 +518,18 @@ export default function DatabaseDetailPage({
           </div>
         </section>
 
-        {/* CONNECTION */}
-
         <section className="rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
           <div className="flex flex-col gap-4 border-b border-[#eef1f5] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
                 <KeyRound className="size-4 text-[#2563eb]" />
-
                 <h2 className="text-sm font-semibold text-[#172033]">
                   Connection
                 </h2>
               </div>
 
               <p className="mt-1 text-xs text-[#98a2b3]">
-                Credentials for connecting applications
-                to this database.
+                Credentials for connecting applications to this database.
               </p>
             </div>
 
@@ -739,9 +544,7 @@ export default function DatabaseDetailPage({
                 <KeyRound className="size-3.5" />
               )}
 
-              {credentials
-                ? "Hide credentials"
-                : "Show credentials"}
+              {credentials ? "Hide credentials" : "Show credentials"}
             </button>
           </div>
 
@@ -753,15 +556,12 @@ export default function DatabaseDetailPage({
 
               <div className="mt-2 flex items-center gap-2">
                 <span className="truncate text-xs font-semibold text-[#344054]">
-                  {credentials?.host ||
-                    database.host}
+                  {credentials?.host || database.host}
                 </span>
 
                 {credentials?.host && (
                   <button
-                    onClick={() =>
-                      copyText(credentials.host)
-                    }
+                    onClick={() => copyText(credentials.host)}
                     className="text-[#98a2b3] hover:text-[#344054]"
                   >
                     <Copy className="size-3.5" />
@@ -799,17 +599,13 @@ export default function DatabaseDetailPage({
 
               <div className="mt-2 flex items-center gap-2">
                 <span className="truncate text-xs font-semibold text-[#344054]">
-                  {credentials?.username ||
-                    database.username ||
-                    "—"}
+                  {credentials?.username || database.username || "—"}
                 </span>
 
                 {credentials?.username && (
                   <button
                     onClick={() =>
-                      copyText(
-                        credentials.username || "",
-                      )
+                      copyText(credentials.username || "")
                     }
                     className="text-[#98a2b3] hover:text-[#344054]"
                   >
@@ -837,23 +633,16 @@ export default function DatabaseDetailPage({
 
                     <button
                       onClick={() =>
-                        setPasswordVisible(
-                          !passwordVisible,
-                        )
+                        setPasswordVisible(!passwordVisible)
                       }
                       className="shrink-0 text-[11px] font-medium text-[#667085] hover:text-[#172033]"
                     >
-                      {passwordVisible
-                        ? "Hide"
-                        : "Show"}
+                      {passwordVisible ? "Hide" : "Show"}
                     </button>
 
                     <button
                       onClick={() =>
-                        copyText(
-                          credentials.password ||
-                            "",
-                        )
+                        copyText(credentials.password || "")
                       }
                       className="shrink-0 text-[#98a2b3] hover:text-[#344054]"
                     >
@@ -876,22 +665,17 @@ export default function DatabaseDetailPage({
 
                     <button
                       onClick={() =>
-                        setConnectionVisible(
-                          !connectionVisible,
-                        )
+                        setConnectionVisible(!connectionVisible)
                       }
                       className="shrink-0 text-[11px] font-medium text-[#667085] hover:text-[#172033]"
                     >
-                      {connectionVisible
-                        ? "Hide"
-                        : "Show"}
+                      {connectionVisible ? "Hide" : "Show"}
                     </button>
 
                     <button
                       onClick={() =>
                         copyText(
-                          credentials.connection_string ||
-                            "",
+                          credentials.connection_string || "",
                         )
                       }
                       className="shrink-0 text-[#98a2b3] hover:text-[#344054]"
@@ -904,8 +688,6 @@ export default function DatabaseDetailPage({
             </div>
           )}
         </section>
-
-        {/* DETAILS */}
 
         <section className="grid gap-5 lg:grid-cols-2">
           <div className="rounded-xl border border-[#e4e8ef] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
@@ -923,9 +705,7 @@ export default function DatabaseDetailPage({
                 </div>
 
                 <span className="text-xs font-medium text-[#344054]">
-                  {engineLabel(
-                    database.database_type,
-                  )}
+                  {engineLabel(database.database_type)}
                 </span>
               </div>
 
@@ -947,9 +727,7 @@ export default function DatabaseDetailPage({
                 </div>
 
                 <span className="text-xs text-[#344054]">
-                  {new Date(
-                    database.created,
-                  ).toLocaleString()}
+                  {new Date(database.created).toLocaleString()}
                 </span>
               </div>
 
@@ -975,44 +753,42 @@ export default function DatabaseDetailPage({
 
             {database.mounts.length ? (
               <div className="divide-y divide-[#eef1f5]">
-                {database.mounts.map(
-                  (mount, index) => (
-                    <div
-                      key={`${mount.source}-${index}`}
-                      className="px-6 py-5"
-                    >
-                      <div className="flex items-center gap-2">
-                        <HardDrive className="size-4 text-[#667085]" />
+                {database.mounts.map((mount, index) => (
+                  <div
+                    key={`${mount.source}-${index}`}
+                    className="px-6 py-5"
+                  >
+                    <div className="flex items-center gap-2">
+                      <HardDrive className="size-4 text-[#667085]" />
 
-                        <span className="text-xs font-semibold text-[#344054]">
-                          Persistent volume
-                        </span>
-                      </div>
+                      <span className="text-xs font-semibold text-[#344054]">
+                        Persistent volume
+                      </span>
+                    </div>
 
-                      <div className="mt-4 grid gap-3">
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wide text-[#98a2b3]">
-                            Server path
-                          </div>
-
-                          <div className="mt-1 break-all font-mono text-[11px] text-[#344054]">
-                            {mount.source}
-                          </div>
+                    <div className="mt-4 grid gap-3">
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-[#98a2b3]">
+                          Server path
                         </div>
 
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wide text-[#98a2b3]">
-                            Container path
-                          </div>
+                        <div className="mt-1 break-all font-mono text-[11px] text-[#344054]">
+                          {mount.source}
+                        </div>
+                      </div>
 
-                          <div className="mt-1 break-all font-mono text-[11px] text-[#344054]">
-                            {mount.destination}
-                          </div>
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-[#98a2b3]">
+                          Container path
+                        </div>
+
+                        <div className="mt-1 break-all font-mono text-[11px] text-[#344054]">
+                          {mount.destination}
                         </div>
                       </div>
                     </div>
-                  ),
-                )}
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="flex min-h-[180px] items-center justify-center px-6 text-center">
@@ -1031,8 +807,6 @@ export default function DatabaseDetailPage({
             )}
           </div>
         </section>
-
-        {/* NETWORK / SECURITY */}
 
         <section className="grid gap-5 lg:grid-cols-2">
           <div className="rounded-xl border border-[#e4e8ef] bg-white p-6 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
@@ -1067,9 +841,8 @@ export default function DatabaseDetailPage({
             </div>
 
             <p className="mt-4 text-[11px] leading-5 text-[#98a2b3]">
-              Database ports are not published directly to
-              the host. They remain inside the private
-              Docker network.
+              Database ports are not published directly to the host. They
+              remain inside the private Docker network.
             </p>
           </div>
 
@@ -1094,8 +867,8 @@ export default function DatabaseDetailPage({
                   </div>
 
                   <div className="mt-1 text-[11px] leading-5 text-[#98a2b3]">
-                    Credentials are only retrieved through
-                    the authenticated JCloud API.
+                    Credentials are only retrieved through the authenticated
+                    JCloud API.
                   </div>
                 </div>
               </div>
@@ -1111,8 +884,7 @@ export default function DatabaseDetailPage({
                   </div>
 
                   <div className="mt-1 text-[11px] leading-5 text-[#98a2b3]">
-                    This instance is controlled by the JCloud
-                    database service.
+                    This instance is controlled by the JCloud database service.
                   </div>
                 </div>
               </div>
@@ -1120,8 +892,6 @@ export default function DatabaseDetailPage({
           </div>
         </section>
       </div>
-
-      {/* LOGS */}
 
       {logsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#172033]/20 px-4 backdrop-blur-[2px]">
@@ -1133,8 +903,7 @@ export default function DatabaseDetailPage({
                 </h2>
 
                 <p className="mt-1 text-[11px] text-[#98a2b3]">
-                  Latest 300 lines from{" "}
-                  {database.name}.
+                  Latest 300 lines from {database.name}.
                 </p>
               </div>
 
@@ -1153,8 +922,6 @@ export default function DatabaseDetailPage({
         </div>
       )}
 
-      {/* DELETE */}
-
       {deleteOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#172033]/20 px-4 backdrop-blur-[2px]">
           <div className="w-full max-w-md rounded-2xl border border-[#e4e8ef] bg-white p-6 shadow-[0_20px_60px_rgba(16,24,40,0.18)]">
@@ -1167,8 +934,8 @@ export default function DatabaseDetailPage({
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-[#667085]">
-              The database container will be removed.
-              Persistent storage is not automatically deleted.
+              The database container will be removed. Persistent storage is
+              not automatically deleted.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">

@@ -27,82 +27,11 @@ import {
 } from "react"
 
 import { JCloudShell } from "@/components/jcloud/shell"
-
-type Port = {
-  container: string
-  host_ip: string | null
-  host: string | null
-}
-
-type Mount = {
-  type: string
-  source: string
-  destination: string
-  read_only: boolean
-}
-
-type Application = {
-  id: string
-  name: string
-  image: string
-  status: string
-  state: string
-  created: string
-  ports: Port[]
-  labels: Record<string, string>
-  command: string[]
-  environment: Record<string, string>
-  restart_policy: string
-  cpu_limit: number | null
-  memory_limit: number | null
-  mounts: Mount[]
-  endpoint_url: string | null
-}
-
-type Stats = {
-  application_id: string
-  cpu_percent: number
-  memory_usage: number
-  memory_limit: number
-  memory_percent: number
-}
-
-const API = "/api"
-
-async function api<T>(
-  path: string,
-  options?: RequestInit,
-): Promise<T> {
-  const response = await fetch(
-    `${API}${path}`,
-    {
-      ...options,
-      credentials: "include",
-      cache: "no-store",
-    },
-  )
-
-  if (!response.ok) {
-    let message = `Request failed (${response.status})`
-
-    try {
-      const data =
-        await response.json()
-
-      if (data?.detail) {
-        message = data.detail
-      }
-    } catch {}
-
-    throw new Error(message)
-  }
-
-  if (response.status === 204) {
-    return undefined as T
-  }
-
-  return response.json()
-}
+import {
+  applicationsApi,
+  type Application,
+  type ApplicationStats as Stats,
+} from "@/lib/api"
 
 function bytes(
   value: number,
@@ -207,10 +136,8 @@ export default function ApplicationDetailPage() {
   async function load() {
     try {
       const app =
-        await api<Application>(
-          `/applications/${encodeURIComponent(
-            id,
-          )}`,
+        await applicationsApi.get(
+          id,
         )
 
       setApplication(app)
@@ -221,10 +148,8 @@ export default function ApplicationDetailPage() {
       ) {
         try {
           const liveStats =
-            await api<Stats>(
-              `/applications/${encodeURIComponent(
-                id,
-              )}/stats`,
+            await applicationsApi.stats(
+              id,
             )
 
           setStats(
@@ -275,14 +200,19 @@ export default function ApplicationDetailPage() {
     setBusy(true)
 
     try {
-      await api(
-        `/applications/${encodeURIComponent(
+      if (type === "start") {
+        await applicationsApi.start(
           id,
-        )}/${type}`,
-        {
-          method: "POST",
-        },
-      )
+        )
+      } else if (type === "stop") {
+        await applicationsApi.stop(
+          id,
+        )
+      } else {
+        await applicationsApi.restart(
+          id,
+        )
+      }
 
       await load()
     } catch (err) {
@@ -308,13 +238,8 @@ export default function ApplicationDetailPage() {
     setBusy(true)
 
     try {
-      await api(
-        `/applications/${encodeURIComponent(
-          id,
-        )}`,
-        {
-          method: "DELETE",
-        },
+      await applicationsApi.delete(
+        id,
       )
 
       router.push(
@@ -336,12 +261,8 @@ export default function ApplicationDetailPage() {
 
     try {
       const result =
-        await api<{
-          logs: string
-        }>(
-          `/applications/${encodeURIComponent(
-            id,
-          )}/logs?tail=500`,
+        await applicationsApi.logs(
+          id,
         )
 
       setLogs(

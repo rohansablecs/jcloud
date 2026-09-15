@@ -25,91 +25,18 @@ import { useEffect, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { JCloudShell } from "@/components/jcloud/shell"
-
-type Port = {
-  container: string
-  host_ip: string | null
-  host: string | null
-}
-
-type Mount = {
-  type: string
-  source: string
-  destination: string
-  read_only: boolean
-}
-
-type Application = {
-  id: string
-  name: string
-  image: string
-  status: string
-  state: string
-  created: string
-  ports: Port[]
-  labels: Record<string, string>
-  command: string[]
-  environment: Record<string, string>
-  restart_policy: string
-  cpu_limit: number | null
-  memory_limit: number | null
-  mounts: Mount[]
-  endpoint_url: string | null
-}
-
-type Stats = {
-  application_id: string
-  cpu_percent: number
-  memory_usage: number
-  memory_limit: number
-  memory_percent: number
-}
-
-const API = "/api"
-
-async function api<T>(
-  path: string,
-  options?: RequestInit,
-): Promise<T> {
-  const response = await fetch(`${API}${path}`, {
-    ...options,
-    credentials: "include",
-    cache: "no-store",
-  })
-
-  if (!response.ok) {
-    let message = `Request failed (${response.status})`
-
-    try {
-      const data = await response.json()
-
-      if (data?.detail) {
-        message = data.detail
-      }
-    } catch {}
-
-    throw new Error(message)
-  }
-
-  if (response.status === 204) {
-    return undefined as T
-  }
-
-  return response.json()
-}
+import {
+  applicationsApi,
+  type Application,
+  type ApplicationStats as Stats,
+} from "@/lib/api"
 
 function formatBytes(
   bytes: number | null | undefined,
 ) {
   if (!bytes) return "—"
 
-  const units = [
-    "B",
-    "KB",
-    "MB",
-    "GB",
-    "TB",
-  ]
+  const units = ["B", "KB", "MB", "GB", "TB"]
 
   let value = bytes
   let unit = 0
@@ -127,9 +54,7 @@ function formatBytes(
   )} ${units[unit]}`
 }
 
-function statusLabel(
-  status: string,
-) {
+function statusLabel(status: string) {
   if (status === "running") return "Running"
   if (status === "exited") return "Stopped"
   if (status === "created") return "Created"
@@ -138,9 +63,7 @@ function statusLabel(
   return status || "Unknown"
 }
 
-function statusClass(
-  status: string,
-) {
+function statusClass(status: string) {
   if (status === "running") {
     return "bg-[#ecfdf3] text-[#027a48]"
   }
@@ -153,12 +76,9 @@ function statusClass(
 }
 
 function portLabel(
-  port: Port,
+  port: Application["ports"][number],
 ) {
-  return port.container.replace(
-    "/tcp",
-    "",
-  )
+  return port.container.replace("/tcp", "")
 }
 
 export default function ApplicationsPage() {
@@ -168,42 +88,24 @@ export default function ApplicationsPage() {
   const [stats, setStats] =
     useState<Record<string, Stats>>({})
 
-  const [loading, setLoading] =
-    useState(true)
-
-  const [error, setError] =
-    useState("")
-
-  const [deployOpen, setDeployOpen] =
-    useState(false)
-
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [deployOpen, setDeployOpen] = useState(false)
   const [logsOpen, setLogsOpen] =
     useState<string | null>(null)
 
-  const [logs, setLogs] =
-    useState("")
-
+  const [logs, setLogs] = useState("")
   const [actionBusy, setActionBusy] =
     useState<string | null>(null)
 
   const [logsLoading, setLogsLoading] =
     useState(false)
 
-  const [name, setName] =
-    useState("")
-
-  const [image, setImage] =
-    useState("")
-
-  const [command, setCommand] =
-    useState("")
-
-  const [cpu, setCpu] =
-    useState("")
-
-  const [memory, setMemory] =
-    useState("256m")
-
+  const [name, setName] = useState("")
+  const [image, setImage] = useState("")
+  const [command, setCommand] = useState("")
+  const [cpu, setCpu] = useState("")
+  const [memory, setMemory] = useState("256m")
   const [restart, setRestart] =
     useState("unless-stopped")
 
@@ -213,12 +115,9 @@ export default function ApplicationsPage() {
   const [mountPath, setMountPath] =
     useState("/app/data")
 
-  const [ports, setPorts] =
-    useState([
-      {
-        container: "80/tcp",
-      },
-    ])
+  const [ports, setPorts] = useState([
+    { container: "80/tcp" },
+  ])
 
   const [environment, setEnvironment] =
     useState([
@@ -230,13 +129,12 @@ export default function ApplicationsPage() {
 
   async function loadApplications() {
     try {
+      setError("")
+
       const data =
-        await api<Application[]>(
-          "/applications",
-        )
+        await applicationsApi.list()
 
       setApplications(data)
-      setError("")
 
       const running = data.filter(
         (app) =>
@@ -246,11 +144,7 @@ export default function ApplicationsPage() {
       const results =
         await Promise.allSettled(
           running.map((app) =>
-            api<Stats>(
-              `/applications/${encodeURIComponent(
-                app.id,
-              )}/stats`,
-            ),
+            applicationsApi.stats(app.id),
           ),
         )
 
@@ -294,9 +188,7 @@ export default function ApplicationsPage() {
       )
 
     return () =>
-      window.clearInterval(
-        interval,
-      )
+      window.clearInterval(interval)
   }, [])
 
   async function deploy() {
@@ -336,53 +228,38 @@ export default function ApplicationsPage() {
         },
       )
 
-      await api<Application>(
-        "/applications",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-            image: image.trim(),
-
-            command: command.trim()
-              ? command
-                  .trim()
-                  .split(/\s+/)
-              : null,
-
-            environment:
-              cleanEnvironment,
-
-            ports: cleanPorts,
-
-            cpu_limit: cpu
-              ? Number(cpu)
-              : null,
-
-            memory_limit:
-              memory.trim()
-                ? memory.trim()
-                : null,
-
-            persistent_storage:
-              persistent,
-
-            mount_path:
-              mountPath.trim() ||
-              "/app/data",
-
-            restart_policy:
-              restart,
-          }),
-        },
-      )
+      await applicationsApi.deploy({
+        name: name.trim(),
+        image: image.trim(),
+        command: command.trim()
+          ? command
+              .trim()
+              .split(/\s+/)
+          : null,
+        environment:
+          cleanEnvironment,
+        ports: cleanPorts,
+        cpu_limit: cpu
+          ? Number(cpu)
+          : null,
+        memory_limit:
+          memory.trim()
+            ? memory.trim()
+            : null,
+        persistent_storage:
+          persistent,
+        mount_path:
+          mountPath.trim() ||
+          "/app/data",
+        restart_policy:
+          restart as
+            | "no"
+            | "always"
+            | "on-failure"
+            | "unless-stopped",
+      })
 
       setDeployOpen(false)
-
       resetForm()
 
       await loadApplications()
@@ -433,14 +310,13 @@ export default function ApplicationsPage() {
     )
 
     try {
-      await api(
-        `/applications/${encodeURIComponent(
-          id,
-        )}/${type}`,
-        {
-          method: "POST",
-        },
-      )
+      if (type === "start") {
+        await applicationsApi.start(id)
+      } else if (type === "stop") {
+        await applicationsApi.stop(id)
+      } else {
+        await applicationsApi.restart(id)
+      }
 
       await loadApplications()
     } catch (err) {
@@ -454,9 +330,7 @@ export default function ApplicationsPage() {
     }
   }
 
-  async function remove(
-    id: string,
-  ) {
+  async function remove(id: string) {
     const application =
       applications.find(
         (item) => item.id === id,
@@ -478,14 +352,7 @@ export default function ApplicationsPage() {
     )
 
     try {
-      await api(
-        `/applications/${encodeURIComponent(
-          id,
-        )}`,
-        {
-          method: "DELETE",
-        },
-      )
+      await applicationsApi.delete(id)
 
       await loadApplications()
     } catch (err) {
@@ -499,23 +366,14 @@ export default function ApplicationsPage() {
     }
   }
 
-  async function openLogs(
-    id: string,
-  ) {
+  async function openLogs(id: string) {
     setLogsOpen(id)
     setLogsLoading(true)
     setLogs("")
 
     try {
       const result =
-        await api<{
-          application_id: string
-          logs: string
-        }>(
-          `/applications/${encodeURIComponent(
-            id,
-          )}/logs?tail=300`,
-        )
+        await applicationsApi.logs(id)
 
       setLogs(result.logs)
     } catch (err) {
@@ -546,9 +404,7 @@ export default function ApplicationsPage() {
       const values =
         Object.values(stats)
 
-      if (!values.length) {
-        return 0
-      }
+      if (!values.length) return 0
 
       return (
         values.reduce(
@@ -569,7 +425,6 @@ export default function ApplicationsPage() {
               <div className="flex size-7 items-center justify-center rounded-lg bg-[#eff6ff]">
                 <Rocket className="size-3.5 text-[#2563eb]" />
               </div>
-
               Application hosting
             </div>
 
@@ -876,8 +731,7 @@ export default function ApplicationsPage() {
                   </p>
 
                   <p className="mt-0.5 text-[11px] text-[#98a2b3]">
-                    Ports exposed inside the
-                    private application network.
+                    Ports exposed inside the private application network.
                   </p>
                 </div>
 
@@ -994,9 +848,9 @@ export default function ApplicationsPage() {
                   </p>
 
                   <p className="mt-1 text-[11px] leading-5 text-[#667085]">
-                    Keep application data even
-                    if the container is deleted
-                    or recreated.
+                    Keep application data even if
+                    the container is deleted or
+                    recreated.
                   </p>
 
                   {persistent && (
@@ -1022,12 +876,7 @@ export default function ApplicationsPage() {
                       />
 
                       <p className="mt-1.5 text-[10px] text-[#98a2b3]">
-                        Stored on the server
-                        under
-                        {" "}
-                        /srv/applications/
-                        {name ||
-                          "<name>"}
+                        Stored on the server under /srv/applications/{name || "<name>"}
                       </p>
                     </div>
                   )}
@@ -1043,8 +892,7 @@ export default function ApplicationsPage() {
                   </p>
 
                   <p className="mt-0.5 text-[11px] text-[#98a2b3]">
-                    Values containing secrets are
-                    masked in JCloud.
+                    Values containing secrets are masked in JCloud.
                   </p>
                 </div>
 
@@ -1132,9 +980,7 @@ export default function ApplicationsPage() {
             <div className="flex justify-end gap-2 border-t border-[#eef0f4] pt-4">
               <button
                 onClick={() => {
-                  setDeployOpen(
-                    false,
-                  )
+                  setDeployOpen(false)
                   resetForm()
                 }}
                 className="h-10 rounded-lg border border-[#e4e8ef] px-4 text-xs font-semibold text-[#475467] hover:bg-[#f8fafc]"
@@ -1219,7 +1065,6 @@ function Metric({
     <div className="rounded-xl border border-[#e4e8ef] bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.02)]">
       <div className="flex items-center gap-2 text-[#667085]">
         {icon}
-
         <span className="text-[11px] font-medium">
           {label}
         </span>
@@ -1316,7 +1161,6 @@ function ApplicationCard({
               0 && (
               <span className="flex items-center gap-1.5 font-mono">
                 <Activity className="size-3.5" />
-
                 :{portLabel(
                   application
                     .ports[0],
@@ -1358,18 +1202,18 @@ function ApplicationCard({
         <div className="flex shrink-0 items-center gap-2">
           {application.endpoint_url &&
             running && (
-              <a
-                href={
-                  application.endpoint_url
-                }
-                target="_blank"
-                rel="noreferrer"
-                className="flex h-9 items-center gap-1.5 rounded-lg border border-[#dbe7fb] bg-[#f7faff] px-3 text-[11px] font-semibold text-[#2563eb] hover:bg-[#eff6ff]"
-              >
-                <ExternalLink className="size-3.5" />
-                Open
-              </a>
-            )}
+            <a
+              href={
+                application.endpoint_url
+              }
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-9 items-center gap-1.5 rounded-lg border border-[#dbe7fb] bg-[#f7faff] px-3 text-[11px] font-semibold text-[#2563eb] hover:bg-[#eff6ff]"
+            >
+              <ExternalLink className="size-3.5" />
+              Open
+            </a>
+          )}
 
           {running ? (
             <button

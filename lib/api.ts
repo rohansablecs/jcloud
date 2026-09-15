@@ -2,6 +2,10 @@ const API_URL = "https://jcloud.taile8e3b7.ts.net/api"
 
 const TOKEN_KEY = "jcloud_access_token"
 
+/* =========================================================
+   AUTHENTICATION
+   ========================================================= */
+
 function getAccessToken(): string | null {
   if (typeof window === "undefined") {
     return null
@@ -22,11 +26,8 @@ function clearAccessToken() {
   }
 }
 
-function authHeaders(
-  headers?: HeadersInit
-): Headers {
+function authHeaders(headers?: HeadersInit): Headers {
   const result = new Headers(headers)
-
   const token = getAccessToken()
 
   if (token) {
@@ -36,23 +37,23 @@ function authHeaders(
   return result
 }
 
+/* =========================================================
+   CORE REQUEST
+   ========================================================= */
 
 async function request<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(
-    `${API_URL}${path}`,
-    {
-      ...options,
-      headers: authHeaders(options.headers),
-      credentials: "include",
-    }
-  )
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: authHeaders(options.headers),
+    credentials: "include",
+    cache: "no-store",
+  })
 
   if (!response.ok) {
-    let message =
-      `JCloud API error: ${response.status}`
+    let message = `JCloud API error: ${response.status}`
 
     try {
       const data = await response.json()
@@ -76,8 +77,9 @@ async function request<T>(
   return response.json()
 }
 
-
-/* ==================== AUTH ==================== */
+/* =========================================================
+   AUTH
+   ========================================================= */
 
 export type UserProfile = {
   authenticated: boolean
@@ -86,25 +88,30 @@ export type UserProfile = {
   email: string
 }
 
+export type LoginResponse = {
+  authenticated: boolean
+  username: string
+  token: string
+}
+
 export const authApi = {
   async login(
     username: string,
-    password: string
-  ) {
-    const data = await request<{
-      authenticated: boolean
-      username: string
-      token: string
-    }>("/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    password: string,
+  ): Promise<LoginResponse> {
+    const data = await request<LoginResponse>(
+      "/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
       },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    })
+    )
 
     setAccessToken(data.token)
 
@@ -115,18 +122,19 @@ export const authApi = {
     try {
       return await request<{
         authenticated: boolean
-      }>("/auth/logout", {
-        method: "POST",
-      })
+      }>(
+        "/auth/logout",
+        {
+          method: "POST",
+        },
+      )
     } finally {
       clearAccessToken()
     }
   },
 
   me() {
-    return request<UserProfile>(
-      "/auth/me"
-    )
+    return request<UserProfile>("/auth/me")
   },
 
   avatarUrl(size = 64) {
@@ -134,8 +142,9 @@ export const authApi = {
   },
 }
 
-
-/* ==================== STORAGE ==================== */
+/* =========================================================
+   STORAGE
+   ========================================================= */
 
 export type StorageItem = {
   name: string
@@ -149,7 +158,7 @@ export type StorageItem = {
 export const storageApi = {
   list(path = "") {
     return request<StorageItem[]>(
-      `/storage/files?path=${encodeURIComponent(path)}`
+      `/storage/files?path=${encodeURIComponent(path)}`,
     )
   },
 
@@ -161,97 +170,60 @@ export const storageApi = {
       `/storage/folder?path=${encodeURIComponent(path)}`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
-  upload(file: File, path = "") {
+  upload(
+    file: File,
+    path = "",
+  ) {
     const formData = new FormData()
 
     formData.append("file", file)
 
-    return fetch(
-      `${API_URL}/storage/upload?path=${encodeURIComponent(path)}`,
+    return request<{
+      uploaded: boolean
+      name: string
+      path: string
+    }>(
+      `/storage/upload?path=${encodeURIComponent(path)}`,
       {
         method: "POST",
-        credentials: "include",
-        headers: authHeaders(),
         body: formData,
-      }
-    ).then(async (response) => {
-      if (!response.ok) {
-        let message =
-          `JCloud API error: ${response.status}`
-
-        try {
-          const data = await response.json()
-
-          if (data?.detail) {
-            message = data.detail
-          }
-        } catch {}
-
-        if (response.status === 401) {
-          clearAccessToken()
-        }
-
-        throw new Error(message)
-      }
-
-      return response.json() as Promise<{
-        uploaded: boolean
-        name: string
-        path: string
-      }>
-    })
+      },
+    )
   },
 
-  uploadMany(files: File[], path = "") {
+  uploadMany(
+    files: File[],
+    path = "",
+  ) {
     const formData = new FormData()
 
     for (const file of files) {
       formData.append("files", file)
     }
 
-    return fetch(
-      `${API_URL}/storage/upload-many?path=${encodeURIComponent(path)}`,
+    return request<{
+      uploaded: number
+      files: Array<{
+        name: string
+        path: string
+      }>
+    }>(
+      `/storage/upload-many?path=${encodeURIComponent(path)}`,
       {
         method: "POST",
-        credentials: "include",
-        headers: authHeaders(),
         body: formData,
-      }
-    ).then(async (response) => {
-      if (!response.ok) {
-        let message =
-          `JCloud API error: ${response.status}`
-
-        try {
-          const data = await response.json()
-
-          if (data?.detail) {
-            message = data.detail
-          }
-        } catch {}
-
-        if (response.status === 401) {
-          clearAccessToken()
-        }
-
-        throw new Error(message)
-      }
-
-      return response.json() as Promise<{
-        uploaded: number
-        files: Array<{
-          name: string
-          path: string
-        }>
-      }>
-    })
+      },
+    )
   },
 
-  rename(path: string, name: string) {
+  rename(
+    path: string,
+    name: string,
+  ) {
     return request<{
       renamed: boolean
       path: string
@@ -260,11 +232,14 @@ export const storageApi = {
       `/storage/rename?path=${encodeURIComponent(path)}&name=${encodeURIComponent(name)}`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
-  move(path: string, destination: string) {
+  move(
+    path: string,
+    destination: string,
+  ) {
     return request<{
       moved: boolean
       source: string
@@ -273,7 +248,7 @@ export const storageApi = {
       `/storage/move?path=${encodeURIComponent(path)}&destination=${encodeURIComponent(destination)}`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
@@ -285,7 +260,7 @@ export const storageApi = {
       `/storage/file?path=${encodeURIComponent(path)}`,
       {
         method: "DELETE",
-      }
+      },
     )
   },
 
@@ -295,12 +270,12 @@ export const storageApi = {
       {
         credentials: "include",
         headers: authHeaders(),
-      }
+        cache: "no-store",
+      },
     )
 
     if (!response.ok) {
-      let message =
-        `JCloud API error: ${response.status}`
+      let message = `JCloud API error: ${response.status}`
 
       try {
         const data = await response.json()
@@ -321,89 +296,65 @@ export const storageApi = {
   },
 }
 
+/* =========================================================
+   MONITORING
+   ========================================================= */
 
-/* ==================== MONITORING ==================== */
+export type StoragePool = {
+  path: string
+  total: number
+  used: number
+  free: number
+  percent: number
+  available: boolean
+}
+
+export type MonitoringSystem = {
+  cpu: {
+    load_1m: number
+    load_5m: number
+    load_15m: number
+  }
+
+  memory: {
+    total: number
+    available: number
+    used: number
+    percent: number
+  }
+
+  storage: {
+    total: number
+    used: number
+    free: number
+    percent: number
+  }
+
+  pools: {
+    nextcloud: StoragePool
+    applications: StoragePool
+    databases: StoragePool
+    vm: StoragePool
+    backups: StoragePool
+  }
+
+  network: {
+    rx_bytes: number
+    tx_bytes: number
+  }
+}
 
 export const monitoringApi = {
   system() {
-    return request<{
-      cpu: {
-        load_1m: number
-        load_5m: number
-        load_15m: number
-      }
-
-      memory: {
-        total: number
-        available: number
-        used: number
-        percent: number
-      }
-
-      storage: {
-        total: number
-        used: number
-        free: number
-        percent: number
-      }
-
-      pools: {
-        nextcloud: {
-          path: string
-          total: number
-          used: number
-          free: number
-          percent: number
-          available: boolean
-        }
-
-        applications: {
-          path: string
-          total: number
-          used: number
-          free: number
-          percent: number
-          available: boolean
-        }
-
-        databases: {
-          path: string
-          total: number
-          used: number
-          free: number
-          percent: number
-          available: boolean
-        }
-
-        vm: {
-          path: string
-          total: number
-          used: number
-          free: number
-          percent: number
-          available: boolean
-        }
-
-        backups: {
-          path: string
-          total: number
-          used: number
-          free: number
-          percent: number
-          available: boolean
-        }
-      }
-
-      network: {
-        rx_bytes: number
-        tx_bytes: number
-      }
-    }>("/monitoring/system")
+    return request<MonitoringSystem>(
+      "/monitoring/system",
+    )
   },
 }
 
-
-/* ==================== MACHINES ==================== */
+/* =========================================================
+   MACHINES
+   ========================================================= */
 
 export type MachineLifecycleState =
   | "AVAILABLE"
@@ -447,17 +398,20 @@ export type MachinesResponse = {
 export const machinesApi = {
   list() {
     return request<MachinesResponse>(
-      "/machines"
+      "/machines",
     )
   },
 
   get(id: string) {
     return request<Machine>(
-      `/machines/${encodeURIComponent(id)}`
+      `/machines/${encodeURIComponent(id)}`,
     )
   },
 
-  claim(id: string, leaseMinutes?: number) {
+  claim(
+    id: string,
+    leaseMinutes?: number,
+  ) {
     return request<Machine>(
       `/machines/${encodeURIComponent(id)}/claim`,
       {
@@ -470,9 +424,9 @@ export const machinesApi = {
             ? {
                 lease_minutes: leaseMinutes,
               }
-            : {}
+            : {},
         ),
-      }
+      },
     )
   },
 
@@ -481,7 +435,7 @@ export const machinesApi = {
       `/machines/${encodeURIComponent(id)}/release`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
@@ -490,7 +444,7 @@ export const machinesApi = {
       `/machines/${encodeURIComponent(id)}/start`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
@@ -499,7 +453,7 @@ export const machinesApi = {
       `/machines/${encodeURIComponent(id)}/stop`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
@@ -508,7 +462,7 @@ export const machinesApi = {
       `/machines/${encodeURIComponent(id)}/reboot`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
@@ -517,18 +471,26 @@ export const machinesApi = {
       machine_id: string
       console: string
     }>(
-      `/machines/${encodeURIComponent(id)}/console`
+      `/machines/${encodeURIComponent(id)}/console`,
     )
   },
 }
 
-
-/* ==================== APPLICATIONS ==================== */
+/* =========================================================
+   APPLICATIONS — TYPES
+   ========================================================= */
 
 export type ApplicationPort = {
   container: string
   host_ip: string | null
   host: string | null
+}
+
+export type ApplicationMount = {
+  type: string
+  source: string
+  destination: string
+  read_only: boolean
 }
 
 export type Application = {
@@ -538,8 +500,24 @@ export type Application = {
   status: string
   state: string
   created: string
+
   ports: ApplicationPort[]
+
   labels: Record<string, string>
+
+  command: string[]
+
+  environment: Record<string, string>
+
+  restart_policy: string
+
+  cpu_limit: number | null
+
+  memory_limit: number | null
+
+  mounts: ApplicationMount[]
+
+  endpoint_url: string | null
 }
 
 export type ApplicationStats = {
@@ -558,14 +536,23 @@ export type ApplicationLogs = {
 export type DeployApplicationData = {
   name: string
   image: string
+
   command: string[] | null
+
   environment: Record<string, string>
+
   ports: Array<{
     container: string
-    host: number
   }>
+
   cpu_limit: number | null
+
   memory_limit: string | null
+
+  persistent_storage: boolean
+
+  mount_path: string
+
   restart_policy:
     | "no"
     | "always"
@@ -573,20 +560,24 @@ export type DeployApplicationData = {
     | "unless-stopped"
 }
 
+/* =========================================================
+   APPLICATIONS — API
+   ========================================================= */
+
 export const applicationsApi = {
   list() {
     return request<Application[]>(
-      "/applications"
+      "/applications",
     )
   },
 
   get(id: string) {
     return request<Application>(
-      `/applications/${encodeURIComponent(id)}`
+      `/applications/${encodeURIComponent(id)}`,
     )
   },
 
-  create(data: DeployApplicationData) {
+  deploy(data: DeployApplicationData) {
     return request<Application>(
       "/applications",
       {
@@ -595,7 +586,7 @@ export const applicationsApi = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }
+      },
     )
   },
 
@@ -604,7 +595,7 @@ export const applicationsApi = {
       `/applications/${encodeURIComponent(id)}/start`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
@@ -613,7 +604,7 @@ export const applicationsApi = {
       `/applications/${encodeURIComponent(id)}/stop`,
       {
         method: "POST",
-      }
+      },
     )
   },
 
@@ -622,22 +613,7 @@ export const applicationsApi = {
       `/applications/${encodeURIComponent(id)}/restart`,
       {
         method: "POST",
-      }
-    )
-  },
-
-  logs(
-    id: string,
-    tail = 200
-  ) {
-    return request<ApplicationLogs>(
-      `/applications/${encodeURIComponent(id)}/logs?tail=${tail}`
-    )
-  },
-
-  stats(id: string) {
-    return request<ApplicationStats>(
-      `/applications/${encodeURIComponent(id)}/stats`
+      },
     )
   },
 
@@ -646,29 +622,149 @@ export const applicationsApi = {
       `/applications/${encodeURIComponent(id)}`,
       {
         method: "DELETE",
-      }
+      },
+    )
+  },
+
+  logs(id: string) {
+    return request<ApplicationLogs>(
+      `/applications/${encodeURIComponent(id)}/logs`,
+    )
+  },
+
+  stats(id: string) {
+    return request<ApplicationStats>(
+      `/applications/${encodeURIComponent(id)}/stats`,
     )
   },
 }
 
+/* =========================================================
+   DATABASES — TYPES
+   ========================================================= */
 
-/* ==================== DATABASES ==================== */
+export type DatabaseType =
+  | "postgresql"
+  | "mysql"
+  | "redis"
+
+export type DatabaseStatus =
+  | "running"
+  | "stopped"
+  | "paused"
+  | "created"
+  | "restarting"
+  | "removing"
+  | "dead"
+  | "unknown"
+  | string
+
+export type DatabaseMount = {
+  type: string | null
+  source: string | null
+  destination: string | null
+  read_only: boolean
+}
+
+export type Database = {
+  id: string
+  name: string
+
+  database_type: DatabaseType
+
+  image: string
+
+  status: DatabaseStatus
+  state: string
+  created: string
+
+  port: number
+
+  database_name: string | null
+  username: string | null
+
+  restart_policy: string
+
+  cpu_limit: number | null
+  memory_limit: number | null
+
+  mounts: DatabaseMount[]
+
+  host: string
+}
+
+export type DatabaseCredentials = {
+  database_type: DatabaseType
+  host: string
+  port: number
+  database_name: string | null
+  username: string | null
+  password: string | null
+  connection_string: string | null
+}
+
+export type DatabaseLogs = {
+  database_id: string
+  logs: string
+}
+
+export type DatabaseStats = {
+  database_id: string
+  cpu_percent: number
+  memory_usage: number
+  memory_limit: number
+  memory_percent: number
+}
+
+export type CreateDatabaseData = {
+  name: string
+
+  database_type: DatabaseType
+
+  database_name?: string
+
+  username?: string
+
+  password?: string
+
+  cpu_limit?: number | null
+
+  memory_limit?: string | null
+
+  persistent_storage: boolean
+
+  restart_policy:
+    | "no"
+    | "always"
+    | "on-failure"
+    | "unless-stopped"
+}
+
+/* =========================================================
+   DATABASES — API
+   ========================================================= */
 
 export const databasesApi = {
   list() {
-    return request(
-      "/databases"
+    return request<Database[]>(
+      "/databases",
     )
   },
 
   get(id: string) {
-    return request(
-      `/databases/${encodeURIComponent(id)}`
+    return request<Database>(
+      `/databases/${encodeURIComponent(id)}`,
     )
   },
 
-  create(data: unknown) {
-    return request(
+  credentials(id: string) {
+    return request<DatabaseCredentials>(
+      `/databases/${encodeURIComponent(id)}/credentials`,
+    )
+  },
+
+  create(data: CreateDatabaseData) {
+    return request<Database>(
       "/databases",
       {
         method: "POST",
@@ -676,16 +772,55 @@ export const databasesApi = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }
+      },
+    )
+  },
+
+  start(id: string) {
+    return request<Database>(
+      `/databases/${encodeURIComponent(id)}/start`,
+      {
+        method: "POST",
+      },
+    )
+  },
+
+  stop(id: string) {
+    return request<Database>(
+      `/databases/${encodeURIComponent(id)}/stop`,
+      {
+        method: "POST",
+      },
+    )
+  },
+
+  restart(id: string) {
+    return request<Database>(
+      `/databases/${encodeURIComponent(id)}/restart`,
+      {
+        method: "POST",
+      },
     )
   },
 
   delete(id: string) {
-    return request(
+    return request<void>(
       `/databases/${encodeURIComponent(id)}`,
       {
         method: "DELETE",
-      }
+      },
+    )
+  },
+
+  logs(id: string) {
+    return request<DatabaseLogs>(
+      `/databases/${encodeURIComponent(id)}/logs`,
+    )
+  },
+
+  stats(id: string) {
+    return request<DatabaseStats>(
+      `/databases/${encodeURIComponent(id)}/stats`,
     )
   },
 }

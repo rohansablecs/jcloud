@@ -25,47 +25,23 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { JCloudShell } from "@/components/jcloud/shell"
-
-type DatabaseItem = {
-  id: string
-  name: string
-  database_type: "postgresql" | "mysql" | "redis"
-  image: string
-  status: string
-  state: string
-  created: string
-  port: number
-  database_name: string | null
-  username: string | null
-  restart_policy: string
-  cpu_limit: number | null
-  memory_limit: number | null
-  mounts: {
-    type: string | null
-    source: string | null
-    destination: string | null
-    read_only: boolean
-  }[]
-  host: string
-}
-
-type DatabaseStats = {
-  cpu_percent: number
-  memory_usage: number
-  memory_limit: number
-  memory_percent: number
-}
+import {
+  databasesApi,
+  type Database as DatabaseItem,
+  type DatabaseStats,
+  type DatabaseType,
+} from "@/lib/api"
 
 type DeployForm = {
   name: string
-  database_type: "postgresql" | "mysql" | "redis"
+  database_type: DatabaseType
   database_name: string
   username: string
   password: string
   cpu_limit: string
   memory_limit: string
   persistent_storage: boolean
-  restart_policy: string
+  restart_policy: "no" | "always" | "on-failure" | "unless-stopped"
 }
 
 const emptyForm: DeployForm = {
@@ -84,12 +60,6 @@ function engineLabel(type: DatabaseItem["database_type"]) {
   if (type === "postgresql") return "PostgreSQL"
   if (type === "mysql") return "MySQL"
   return "Redis"
-}
-
-function engineDescription(type: DatabaseItem["database_type"]) {
-  if (type === "postgresql") return "Relational database"
-  if (type === "mysql") return "Relational database"
-  return "In-memory data store"
 }
 
 function engineIcon(type: DatabaseItem["database_type"]) {
@@ -117,15 +87,6 @@ function isRunning(database: DatabaseItem) {
   return database.status === "running" || database.state === "running"
 }
 
-function isStopped(database: DatabaseItem) {
-  return (
-    database.status === "exited" ||
-    database.state === "exited" ||
-    database.status === "created" ||
-    database.state === "created"
-  )
-}
-
 export default function DatabasesPage() {
   const [databases, setDatabases] = useState<DatabaseItem[]>([])
   const [stats, setStats] = useState<Record<string, DatabaseStats>>({})
@@ -143,35 +104,25 @@ export default function DatabasesPage() {
   const [deleteTarget, setDeleteTarget] = useState<DatabaseItem | null>(null)
   const [menuId, setMenuId] = useState<string | null>(null)
 
-  const loadDatabases = useCallback(
-    async (showSpinner = false) => {
-      if (showSpinner) setRefreshing(true)
+  const loadDatabases = useCallback(async (showSpinner = false) => {
+    if (showSpinner) {
+      setRefreshing(true)
+    }
 
-      try {
-        const response = await fetch("/api/databases", {
-          credentials: "include",
-          cache: "no-store",
-        })
+    try {
+      const data = await databasesApi.list()
 
-        if (!response.ok) {
-          throw new Error("Unable to load databases.")
-        }
-
-        const data = await response.json()
-        setDatabases(data)
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to load databases.",
-        )
-      } finally {
-        setLoading(false)
-        setRefreshing(false)
-      }
-    },
-    [],
-  )
+      setDatabases(data)
+      setError("")
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to load databases.",
+      )
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }, [])
 
   const loadStats = useCallback(async (items: DatabaseItem[]) => {
     const running = items.filter(isRunning)
@@ -184,26 +135,11 @@ export default function DatabasesPage() {
     const results = await Promise.all(
       running.map(async (database) => {
         try {
-          const response = await fetch(
-            `/api/databases/${database.id}/stats`,
-            {
-              credentials: "include",
-              cache: "no-store",
-            },
-          )
-
-          if (!response.ok) return null
-
-          const data = await response.json()
+          const data = await databasesApi.stats(database.id)
 
           return {
             id: database.id,
-            stats: {
-              cpu_percent: data.cpu_percent,
-              memory_usage: data.memory_usage,
-              memory_limit: data.memory_limit,
-              memory_percent: data.memory_percent,
-            },
+            stats: data,
           }
         } catch {
           return null
@@ -237,11 +173,15 @@ export default function DatabasesPage() {
   useEffect(() => {
     if (databases.length) {
       loadStats(databases)
+    } else {
+      setStats({})
     }
   }, [databases, loadStats])
 
   useEffect(() => {
-    if (!success && !error) return
+    if (!success && !error) {
+      return
+    }
 
     const timer = window.setTimeout(() => {
       setSuccess("")
@@ -281,56 +221,58 @@ export default function DatabasesPage() {
       return
     }
 
+    if (
+      form.cpu_limit.trim() &&
+      (
+        Number.isNaN(Number(form.cpu_limit)) ||
+        Number(form.cpu_limit) <= 0
+      )
+    ) {
+      setError("CPU limit must be a positive number.")
+      return
+    }
+
     setDeploying(true)
 
     try {
-      const body: Record<string, unknown> = {
+      const data = await databasesApi.create({
         name: form.name.trim(),
         database_type: form.database_type,
+        ...(form.database_name.trim()
+          ? {
+              database_name: form.database_name.trim(),
+            }
+          : {}),
+        ...(form.username.trim()
+          ? {
+              username: form.username.trim(),
+            }
+          : {}),
+        ...(form.password.trim()
+          ? {
+              password: form.password.trim(),
+            }
+          : {}),
+        ...(form.cpu_limit.trim()
+          ? {
+              cpu_limit: Number(form.cpu_limit),
+            }
+          : {}),
+        ...(form.memory_limit.trim()
+          ? {
+              memory_limit: form.memory_limit.trim(),
+            }
+          : {}),
         persistent_storage: form.persistent_storage,
         restart_policy: form.restart_policy,
-      }
-
-      if (form.database_name.trim()) {
-        body.database_name = form.database_name.trim()
-      }
-
-      if (form.username.trim()) {
-        body.username = form.username.trim()
-      }
-
-      if (form.password.trim()) {
-        body.password = form.password.trim()
-      }
-
-      if (form.cpu_limit.trim()) {
-        body.cpu_limit = Number(form.cpu_limit)
-      }
-
-      if (form.memory_limit.trim()) {
-        body.memory_limit = form.memory_limit.trim()
-      }
-
-      const response = await fetch("/api/databases", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
       })
-
-      const data = await response.json().catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail || "Unable to deploy database.",
-        )
-      }
 
       setModalOpen(false)
       setForm(emptyForm)
-      setSuccess(`${engineLabel(data.database_type)} deployed successfully.`)
+
+      setSuccess(
+        `${engineLabel(data.database_type)} deployed successfully.`,
+      )
 
       await loadDatabases()
     } catch (err) {
@@ -354,21 +296,12 @@ export default function DatabasesPage() {
     setMenuId(null)
 
     try {
-      const response = await fetch(
-        `/api/databases/${database.id}/${action}`,
-        {
-          method: "POST",
-          credentials: "include",
-        },
-      )
-
-      const data = await response.json().catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            `Unable to ${action} database.`,
-        )
+      if (action === "start") {
+        await databasesApi.start(database.id)
+      } else if (action === "stop") {
+        await databasesApi.stop(database.id)
+      } else {
+        await databasesApi.restart(database.id)
       }
 
       await loadDatabases()
@@ -392,29 +325,16 @@ export default function DatabasesPage() {
   }
 
   async function deleteDatabase() {
-    if (!deleteTarget) return
+    if (!deleteTarget) {
+      return
+    }
 
     setError("")
     setSuccess("")
     setActionId(deleteTarget.id)
 
     try {
-      const response = await fetch(
-        `/api/databases/${deleteTarget.id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      )
-
-      const data = await response.json().catch(() => null)
-
-      if (!response.ok) {
-        throw new Error(
-          data?.detail ||
-            "Unable to delete database.",
-        )
-      }
+      await databasesApi.delete(deleteTarget.id)
 
       setDatabases((current) =>
         current.filter(
@@ -424,9 +344,7 @@ export default function DatabasesPage() {
       )
 
       setDeleteTarget(null)
-      setSuccess(
-        `${deleteTarget.name} deleted.`,
-      )
+      setSuccess(`${deleteTarget.name} deleted.`)
     } catch (err) {
       setError(
         err instanceof Error
@@ -465,15 +383,12 @@ export default function DatabasesPage() {
         className="mx-auto w-full max-w-[1500px] space-y-8"
         onClick={() => setMenuId(null)}
       >
-        {/* HEADER */}
-
         <section className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
           <div>
             <div className="flex items-center gap-2 text-xs font-medium text-[#667085]">
               <div className="flex size-7 items-center justify-center rounded-lg bg-[#eff6ff]">
                 <Database className="size-3.5 text-[#2563eb]" />
               </div>
-
               Data services
             </div>
 
@@ -482,8 +397,7 @@ export default function DatabasesPage() {
             </h1>
 
             <p className="mt-2 max-w-xl text-sm text-[#667085]">
-              Provision and manage databases for your
-              applications.
+              Provision and manage databases for your applications.
             </p>
           </div>
 
@@ -499,8 +413,6 @@ export default function DatabasesPage() {
             Create database
           </Button>
         </section>
-
-        {/* ALERTS */}
 
         {(error || success) && (
           <div
@@ -531,8 +443,6 @@ export default function DatabasesPage() {
             </button>
           </div>
         )}
-
-        {/* OVERVIEW */}
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl border border-[#e4e8ef] bg-white p-5 shadow-[0_2px_8px_rgba(16,24,40,0.03)]">
@@ -610,8 +520,6 @@ export default function DatabasesPage() {
           </div>
         </section>
 
-        {/* DATABASES */}
-
         <section>
           <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -620,8 +528,7 @@ export default function DatabasesPage() {
               </h2>
 
               <p className="mt-1 text-xs text-[#98a2b3]">
-                Database instances provisioned through
-                JCloud.
+                Database instances provisioned through JCloud.
               </p>
             </div>
 
@@ -667,9 +574,8 @@ export default function DatabasesPage() {
                   </h3>
 
                   <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#667085]">
-                    Create a database to give your
-                    applications a managed place to store
-                    and work with data.
+                    Create a database to give your applications a managed
+                    place to store and work with data.
                   </p>
 
                   <div className="mt-8 grid overflow-hidden rounded-xl border border-[#e4e8ef] sm:grid-cols-3">
@@ -732,7 +638,8 @@ export default function DatabasesPage() {
               <div className="divide-y divide-[#eef1f5]">
                 {databases.map((database) => {
                   const running = isRunning(database)
-                  const databaseStats = stats[database.id]
+                  const databaseStats =
+                    stats[database.id]
 
                   return (
                     <div
@@ -787,9 +694,7 @@ export default function DatabasesPage() {
                               /
                             </span>
 
-                            <span>
-                              {database.image}
-                            </span>
+                            <span>{database.image}</span>
 
                             <span className="text-[#d0d5dd]">
                               /
@@ -810,6 +715,7 @@ export default function DatabasesPage() {
 
                           <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-[#344054]">
                             <Activity className="size-3.5 text-[#98a2b3]" />
+
                             {databaseStats
                               ? `${databaseStats.cpu_percent.toFixed(1)}%`
                               : database.cpu_limit
@@ -841,6 +747,7 @@ export default function DatabasesPage() {
 
                           <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-[#344054]">
                             <HardDrive className="size-3.5 text-[#98a2b3]" />
+
                             {database.mounts.length
                               ? "Persistent"
                               : "Ephemeral"}
@@ -883,6 +790,7 @@ export default function DatabasesPage() {
                             ) : (
                               <CircleStop className="size-3.5" />
                             )}
+
                             Stop
                           </button>
                         ) : (
@@ -903,6 +811,7 @@ export default function DatabasesPage() {
                             ) : (
                               <Play className="size-3.5" />
                             )}
+
                             Start
                           </button>
                         )}
@@ -972,8 +881,6 @@ export default function DatabasesPage() {
           </div>
         </section>
 
-        {/* INFORMATION */}
-
         <section className="rounded-xl border border-[#dbe7fb] bg-[#f7faff] p-5 sm:p-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
@@ -986,16 +893,14 @@ export default function DatabasesPage() {
               </h3>
 
               <p className="mt-1 max-w-2xl text-xs leading-5 text-[#667085]">
-                JCloud databases run on an isolated Docker
-                network with persistent storage managed
-                independently from application containers.
+                JCloud databases run on an isolated Docker network with
+                persistent storage managed independently from application
+                containers.
               </p>
             </div>
           </div>
         </section>
       </div>
-
-      {/* CREATE MODAL */}
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#172033]/20 px-4 backdrop-blur-[2px]">
@@ -1030,7 +935,8 @@ export default function DatabasesPage() {
                     value={form.database_type}
                     onChange={(event) => {
                       const type =
-                        event.target.value as DeployForm["database_type"]
+                        event.target
+                          .value as DeployForm["database_type"]
 
                       setForm((current) => ({
                         ...current,
@@ -1098,12 +1004,7 @@ export default function DatabasesPage() {
                               event.target.value,
                           }))
                         }
-                        placeholder={
-                          form.database_type ===
-                          "postgresql"
-                            ? "myapp"
-                            : "myapp"
-                        }
+                        placeholder="myapp"
                         className="form-input"
                       />
                     </div>
@@ -1211,7 +1112,7 @@ export default function DatabasesPage() {
                       setForm((current) => ({
                         ...current,
                         restart_policy:
-                          event.target.value,
+                          event.target.value as DeployForm["restart_policy"],
                       }))
                     }
                     className="form-input"
@@ -1238,8 +1139,8 @@ export default function DatabasesPage() {
                     </div>
 
                     <div className="mt-1 text-[11px] text-[#98a2b3]">
-                      Keep database data across container
-                      restarts and recreation.
+                      Keep database data across container restarts and
+                      recreation.
                     </div>
                   </div>
 
@@ -1290,8 +1191,6 @@ export default function DatabasesPage() {
         </div>
       )}
 
-      {/* DELETE CONFIRMATION */}
-
       {deleteTarget && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#172033]/20 px-4 backdrop-blur-[2px]">
           <div className="w-full max-w-md rounded-2xl border border-[#e4e8ef] bg-white p-6 shadow-[0_20px_60px_rgba(16,24,40,0.18)]">
@@ -1304,15 +1203,19 @@ export default function DatabasesPage() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-[#667085]">
-              This removes the database container. Persistent
-              files under the database storage directory are
-              intentionally left untouched.
+              This removes the database container. Persistent files under
+              the database storage directory are intentionally left
+              untouched.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">
               <button
-                onClick={() => setDeleteTarget(null)}
-                disabled={actionId === deleteTarget.id}
+                onClick={() =>
+                  setDeleteTarget(null)
+                }
+                disabled={
+                  actionId === deleteTarget.id
+                }
                 className="h-9 rounded-lg px-4 text-xs font-medium text-[#667085] hover:bg-[#f2f4f7]"
               >
                 Cancel
@@ -1320,7 +1223,9 @@ export default function DatabasesPage() {
 
               <button
                 onClick={deleteDatabase}
-                disabled={actionId === deleteTarget.id}
+                disabled={
+                  actionId === deleteTarget.id
+                }
                 className="flex h-9 items-center rounded-lg bg-[#d92d20] px-4 text-xs font-semibold text-white hover:bg-[#b42318] disabled:opacity-60"
               >
                 {actionId === deleteTarget.id ? (
