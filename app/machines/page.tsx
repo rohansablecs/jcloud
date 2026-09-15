@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button"
 import { JCloudShell } from "@/components/jcloud/shell"
 import {
   machinesApi,
+  request,
   type Machine,
   type MachineLifecycleState,
 } from "@/lib/api"
@@ -241,144 +242,101 @@ export default function MachinesPage() {
   }, [loadMachines])
 
 
-  async function openConsole(
-    machine: Machine
+  async function openConsole(machine: Machine) {
+  if (
+    machine.lifecycle_state !== "IN_USE" ||
+    machine.state !== "running"
   ) {
+    setError(
+      "Machine must be running to open the console."
+    )
+    return
+  }
 
-    if (
-      machine.lifecycle_state !==
-        "IN_USE" ||
-      machine.state !==
-        "running"
-    ) {
-      setError(
-        "Machine must be running to open the console."
-      )
-      return
-    }
+  /*
+   * Open the window immediately from the user's
+   * click so Brave/Safari popup blockers don't
+   * reject it while the ticket request is running.
+   */
+  const viewerWindow = window.open(
+    "about:blank",
+    "_blank"
+  )
+
+  if (!viewerWindow) {
+    setError(
+      "Console window was blocked by the browser. Allow popups for JCloud and try again."
+    )
+    return
+  }
+
+  setConsoleMachine(machine.id)
+  setError(null)
+
+  try {
+    viewerWindow.document.title =
+      "JCloud Console"
+
+    viewerWindow.document.body.innerHTML = `
+      <div style="
+        margin:0;
+        min-height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:#090a0a;
+        color:#e8e8e3;
+        font-family:monospace;
+      ">
+        CONNECTING TO ${machine.display_name.toUpperCase()}...
+      </div>
+    `
 
     /*
-     * Open the window immediately from the
-     * user's click so browser popup blockers
-     * do not reject it while the ticket request
-     * is in flight.
+     * IMPORTANT:
+     * Do NOT use raw fetch("/api/...") here.
+     *
+     * machinesApi.console() uses the same authenticated
+     * API client as the rest of the Machines page.
      */
-    const viewerWindow =
-      window.open(
-        "about:blank",
-        "_blank"
-      )
-
-    if (!viewerWindow) {
-      setError(
-        "Console window was blocked by the browser. Allow popups for JCloud and try again."
-      )
-      return
-    }
-
-    setConsoleMachine(
+    const data =
+  await request<ConsoleTicketResponse>(
+    `/machines/${encodeURIComponent(
       machine.id
-    )
-
-    setError(null)
-
-    try {
-
-      viewerWindow.document.title =
-        "JCloud Console"
-
-      viewerWindow.document.body.innerHTML = `
-        <div style="
-          margin:0;
-          min-height:100vh;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          background:#090a0a;
-          color:#e8e8e3;
-          font-family:monospace;
-        ">
-          CONNECTING TO ${machine.display_name.toUpperCase()}...
-        </div>
-      `
-
-      const response =
-        await fetch(
-          `/api/machines/${machine.id}/console-ticket`,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          }
-        )
-
-      if (!response.ok) {
-
-        let message =
-          "Unable to open machine console"
-
-        try {
-          const body =
-            await response.json()
-
-          if (
-            typeof body?.detail ===
-            "string"
-          ) {
-            message = body.detail
-          }
-        } catch {
-          // Keep generic message.
-        }
-
-        throw new Error(message)
-      }
-
-      const data =
-        (await response.json()) as
-          ConsoleTicketResponse
-
-      if (
-        !data.viewer_url
-      ) {
-        throw new Error(
-          "Console gateway did not return a viewer URL."
-        )
-      }
-
-      /*
-       * The viewer URL points directly to
-       * the server-side SPICE HTML5 client.
-       *
-       * That page establishes:
-       *
-       * browser
-       *   -> WSS
-       *   -> FastAPI
-       *   -> localhost:5900
-       *   -> QEMU/SPICE
-       */
-      viewerWindow.location.href =
-        data.viewer_url
-
-    } catch (err) {
-
-      viewerWindow.close()
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Unable to open machine console"
-      )
-
-    } finally {
-
-      setConsoleMachine(null)
+    )}/console-ticket`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
     }
+  )
+
+if (!data.viewer_url) {
+  throw new Error(
+    "Console gateway did not return a viewer URL."
+  )
+}
+
+viewerWindow.location.href =
+  data.viewer_url
+
+    viewerWindow.location.href =
+      data.viewer_url
+
+  } catch (err) {
+    viewerWindow.close()
+
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Unable to open machine console"
+    )
+  } finally {
+    setConsoleMachine(null)
   }
+}
 
 
   async function performAction(
